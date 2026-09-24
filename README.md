@@ -10,15 +10,12 @@ This repository is a portable, version-controlled global Pi harness. It is meant
 - Node.js `>=24.21.0`; use Node 24.21.0 or newer.
 - npm.
 - Python 3 for the optional developer pre-commit environment.
-- `@earendil-works/pi-coding-agent` at the version pinned in `package.json` (currently `0.87.1`).
+- A user-writable npm global prefix whose `bin` directory is on `PATH`.
 
-Install the pinned Pi release explicitly:
-
-```bash
-npm install -g --ignore-scripts @earendil-works/pi-coding-agent@0.87.1
-```
-
-The harness scripts validate Node and Pi; they do not install or upgrade them.
+Bootstrap installs the exact Pi package/version declared in `package.json` through
+global npm, or reuses it when already correct. Only npm-managed Pi installations
+are supported; bootstrap refuses another `pi` executable shadowing that install.
+It never installs Node or uses `sudo`.
 
 ## Fresh installation
 
@@ -70,10 +67,10 @@ This redirects Pi's whole global agent directory, including configuration and wr
 | `agents/` | Harness convention for future role definitions; not a Pi-native auto-discovery directory. |
 | `agents/README.md` | Defines what a future role file may control and prevents mistaken auto-discovery assumptions. |
 | `scripts/` | Operator commands that are safe to invoke from any working directory. |
-| `scripts/bootstrap.sh` | Validates prerequisites, installs locked local dependencies, and prepares the external session directory. |
+| `scripts/bootstrap.sh` | Converges the declared npm-managed Pi, installs locked local dependencies, reconciles pinned external packages, and prepares the external session directory. |
 | `scripts/doctor.sh` | Checks activation, versions, configuration, resource structure, state separation, and offline Pi startup. |
 | `scripts/update.sh` | Fast-forwards a clean harness checkout, restores locked dependencies, and runs the doctor. |
-| `scripts/validate-contract.mjs` | Validates only the cross-file Node and Pi metadata relationships. |
+| `scripts/validate-contract.mjs` | Validates the Node/Pi contract and pinned package declarations; `--sync-pi-marker` updates the derived changelog marker after an intentional Pi pin change. |
 | `tasks/` | Versioned planning, review, and implementation-checklist material. |
 
 The empty resource directories contain only zero-content `.gitkeep` placeholders so Git preserves their structure. Pi also supports root `keybindings.json`, `SYSTEM.md`, and `APPEND_SYSTEM.md`; they are deliberately absent until a demonstrated need exists.
@@ -83,6 +80,11 @@ The empty resource directories contain only zero-content `.gitkeep` placeholders
 Pi discovers global configuration and resources because this checkout is the active agent directory. That differs from Pi's package-manifest mechanism: this repository intentionally has no root Pi package manifest or `pi-package` keyword, and installing it as a Pi package would not reproduce global settings or instructions.
 
 Dependencies imported directly by local extensions belong in root `package.json` and `package-lock.json`. External Pi packages are a separate concern: when deliberately introduced, declare them through Pi's package configuration and pin npm packages to exact versions and Git packages to immutable commits. The initial harness installs no external Pi packages.
+
+When deliberately changing the Pi pin, edit only the package/version in
+`package.json`, then run `node scripts/validate-contract.mjs --sync-pi-marker`
+to align Pi's required `settings.json.lastChangelogVersion` marker. The normal
+validator and pre-commit hook reject an unsynchronised marker.
 
 ## Secrets and local state
 
@@ -117,7 +119,7 @@ From a clean checkout, run:
 ./scripts/update.sh
 ```
 
-This fast-forwards the harness, installs its locked local dependencies, and runs the doctor. It does not update Pi itself or change the pinned Pi version. Pi version changes are deliberate repository changes and must keep metadata, documentation, and the install command aligned.
+This fast-forwards the harness, installs its locked local dependencies, and runs the doctor. It does not update Pi itself or change the pinned Pi version. After a deliberate pin change, run bootstrap to install the new declared version before doctor. Routine update convergence is planned separately.
 
 ## Rollback
 

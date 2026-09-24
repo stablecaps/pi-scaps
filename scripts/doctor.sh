@@ -284,7 +284,6 @@ fi
 metadata_valid=false
 pi_contract_valid=false
 node_requirement=""
-pi_package=""
 expected_pi_version=""
 last_changelog_version=""
 configured_session_dir=""
@@ -319,7 +318,6 @@ if [[ "$node_available" == true && -f "$repo_root/package.json" && -f "$repo_roo
     mapfile -t harness_metadata <<< "$metadata"
     if ((${#harness_metadata[@]} == 5)); then
       node_requirement="${harness_metadata[0]}"
-      pi_package="${harness_metadata[1]}"
       expected_pi_version="${harness_metadata[2]}"
       last_changelog_version="${harness_metadata[3]}"
       configured_session_dir="${harness_metadata[4]}"
@@ -355,7 +353,6 @@ if [[ "$metadata_valid" == true ]]; then
     fail "unsupported Node requirement format: $node_requirement"
   fi
 
-  pi_install_command="npm install -g --ignore-scripts ${pi_package}@${expected_pi_version}"
   if command -v pi >/dev/null 2>&1; then
     if pi_version_output="$(pi --version 2>&1)"; then
       if [[ "$pi_version_output" =~ ^[[:space:]]*(pi[[:space:]]+)?v?([0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?)[[:space:]]*$ ]]; then
@@ -365,19 +362,19 @@ if [[ "$metadata_valid" == true ]]; then
           pass "Pi $actual_pi_version matches the harness contract"
         else
           fail "Pi version mismatch: expected $expected_pi_version, found $actual_pi_version"
-          info "Install the declared version with: $pi_install_command"
+          info "Run ./scripts/bootstrap.sh to install the declared Pi version"
         fi
       else
         fail "could not parse Pi version output"
-        info "Install the declared version with: $pi_install_command"
+        info "Run ./scripts/bootstrap.sh to install the declared Pi version"
       fi
     else
       fail "could not run pi --version"
-      info "Install the declared version with: $pi_install_command"
+      info "Run ./scripts/bootstrap.sh to install the declared Pi version"
     fi
   else
     fail "required command not found: pi"
-    info "Install the declared version with: $pi_install_command"
+    info "Run ./scripts/bootstrap.sh to install the declared Pi version"
   fi
 
   configured_session_path=""

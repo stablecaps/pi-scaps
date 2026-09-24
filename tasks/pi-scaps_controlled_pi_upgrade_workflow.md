@@ -237,40 +237,40 @@ installation; a separate uninstall step and rollback script are unnecessary.
 
 ### Group 1 — Normalise the version contract
 
-- [ ] Retain one authoritative Pi package/version pair in `package.json`.
-- [ ] Remove unnecessary human-maintained copies of the literal version from normal
+- [x] Retain one authoritative Pi package/version pair in `package.json`.
+- [x] Remove unnecessary human-maintained copies of the literal version from normal
   installation instructions.
-- [ ] Keep required derived metadata, including `lastChangelogVersion`, synchronised
+- [x] Keep required derived metadata, including `lastChangelogVersion`, synchronised
   through tooling.
-- [ ] Update the existing contract validator and pre-commit checks to enforce only
+- [x] Update the existing contract validator and pre-commit checks to enforce only
   intentional cross-file relationships.
-- [ ] Preserve exact version validation in doctor.
+- [x] Preserve exact version validation in doctor.
 
-- [ ] **Group 1 complete:** a Pi version bump has one source value and only
+- [x] **Group 1 complete:** a Pi version bump has one source value and only
   necessary derived values.
 
 ### Group 2 — Make bootstrap converge Pi
 
-- [ ] Change bootstrap from “validate and print a remediation command” to “ensure the
+- [x] Change bootstrap from “validate and print a remediation command” to “ensure the
   exact declared Pi version is installed.”
-- [ ] If `pi` already exists, verify that the active executable belongs to the global
+- [x] If `pi` already exists, verify that the active executable belongs to the global
   npm installation being managed; fail clearly if another installation shadows it.
-- [ ] Skip global installation when the npm-managed Pi executable already reports the
+- [x] Skip global installation when the npm-managed Pi executable already reports the
   exact declared version.
-- [ ] If Pi is absent or mismatched, install
+- [x] If Pi is absent or mismatched, install
   `package.json.piHarness.package@package.json.piHarness.version` globally through
   npm using `--ignore-scripts`.
-- [ ] Refresh shell command lookup after installation and verify that the active
+- [x] Refresh shell command lookup after installation and verify that the active
   `pi --version` exactly matches the declared version.
-- [ ] Never invoke `sudo`, edit npm configuration, or change shell profiles.
-- [ ] Give a clear remediation when the user's npm global prefix is not writable.
-- [ ] Continue running `npm ci`, creating external state directories, and providing
+- [x] Never invoke `sudo`, edit npm configuration, or change shell profiles.
+- [x] Give a clear remediation when the user's npm global prefix is not writable.
+- [x] Continue running `npm ci`, creating external state directories, and providing
   concise next steps.
-- [ ] Validate that every declared external Pi package is pinned, then reconcile the
+- [x] Validate that every declared external Pi package is pinned, then reconcile the
   declared package set without moving any pin.
-- [ ] Remain safe and idempotent when run repeatedly.
+- [x] Remain safe and idempotent when run repeatedly.
 
-- [ ] **Group 2 complete:** a supported fresh machine with Node/npm can clone the
+- [x] **Group 2 complete:** a supported fresh machine with Node/npm can clone the
   repository and obtain the exact declared Pi version by running bootstrap.
 
 ### Group 3 — Make routine update reconverge the machine
