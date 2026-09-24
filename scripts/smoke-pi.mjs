@@ -19,7 +19,7 @@ const result = spawnSync("pi", ["--mode", "rpc", "--no-session", "--offline"], {
   maxBuffer: 1024 * 1024,
 });
 
-if (result.error || result.status !== 0) {
+if (result.status !== 0) {
   const category = result.error?.code === "ENOENT"
     ? "could not find the Pi executable"
     : result.error?.code === "ETIMEDOUT"

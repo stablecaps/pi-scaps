@@ -411,23 +411,23 @@ bump is still required to close the first checkbox and Group 6 acceptance.
 
 ### Group 8 — Verification and handoff
 
-- [ ] Run Bash syntax, ShellCheck, JSON validation, contract validation, pre-commit,
+- [x] Run Bash syntax, ShellCheck, JSON validation, contract validation, pre-commit,
   and whitespace checks.
-- [ ] Verify bootstrap installs missing Pi, replaces a mismatched Pi, and is a no-op
+- [x] Verify bootstrap installs missing Pi, replaces a mismatched Pi, and is a no-op
   for the correct version.
-- [ ] Verify bootstrap and upgrade refuse an active Pi executable that is not managed
+- [x] Verify bootstrap and upgrade refuse an active Pi executable that is not managed
   by the expected global npm installation.
-- [ ] Verify routine update applies a changed repository pin in a disposable clone or
+- [x] Verify routine update applies a changed repository pin in a disposable clone or
   otherwise controlled Git setup.
-- [ ] Verify explicit-version and `latest` upgrade paths.
-- [ ] Verify `latest` rejects a prerelease result while an explicit prerelease remains
+- [x] Verify explicit-version and `latest` upgrade paths.
+- [x] Verify `latest` rejects a prerelease result while an explicit prerelease remains
   opt-in.
-- [ ] Verify an incompatible candidate Node engine fails before Pi installation or
+- [x] Verify an incompatible candidate Node engine fails before Pi installation or
   metadata mutation, and a raised candidate minimum requires a separate Node-contract
   update.
-- [ ] Verify failed candidate installation exits non-zero and prints targeted recovery
+- [x] Verify failed candidate installation exits non-zero and prints targeted recovery
   instructions without changing tracked metadata or Git history.
-- [ ] Verify failed pinned-package reconciliation exits non-zero while leaving the
+- [x] Verify failed pinned-package reconciliation exits non-zero while leaving the
   candidate proposal available for diagnosis.
 - [ ] Verify failed harness loading exits non-zero while leaving the candidate and
   proposed metadata available for diagnosis.
@@ -448,6 +448,12 @@ bump is still required to close the first checkbox and Group 6 acceptance.
 
 - [ ] **Group 8 complete:** fresh install, routine synchronisation, successful
   upgrade, failed upgrade, and explicit recovery paths behave as documented.
+
+The first nine checks passed on 2026-09-25. Full pinned pre-commit, Bash/Node
+syntax, contract, and whitespace checks passed in this checkout. Disposable
+local Git clones with fake npm and Pi executables exercised installation,
+ownership, update, candidate selection, Node-engine gates, and failure states;
+these do not replace a real registry-backed Pi upgrade check.
 
 ## 7. Acceptance criteria
 
