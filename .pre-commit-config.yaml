@@ -1,0 +1,72 @@
+minimum_pre_commit_version: "4.6.2"
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude: ^settings\.json$
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-json
+        files: ^(?:package(?:-lock)?\.json|settings\.json|models\.json\.example)$
+        types: [file]
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-executables-have-shebangs
+      - id: check-symlinks
+      - id: check-yaml
+      - id: detect-private-key
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1-1
+    hooks:
+      - id: shellcheck
+
+  - repo: local
+    hooks:
+      - id: pi-harness-contract
+        name: validate Pi harness contract
+        entry: node scripts/validate-contract.mjs
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: npm-dependency-tree
+        name: validate npm dependency tree
+        entry: npm ls --depth=0
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: forbid-pi-runtime-state
+        name: forbid tracked Pi credentials and runtime state
+        language: fail
+        entry: forbidden Pi credential or runtime-state path
+        files: |
+          (?x)^(?:
+            auth\.json(?:\.lock(?:/.*)?)?|
+            oauth\.json|
+            models\.json|
+            sessions(?:/.*)?|
+            models-store\.json|
+            crashes\.json|
+            settings\.json\.lock(?:/.*)?|
+            trust\.json(?:\.lock(?:/.*)?)?|
+            pi-debug\.log|
+            (?:logs|tmp|git|npm|bin|tools|venv|\.venv)(?:/.*)?|
+            (?:.*/)?node_modules(?:/.*)?|
+            (?:.*/)?\.env(?:\.(?!example$).+)?|
+            (?:.*/)?\.npmrc|
+            .*\.(?:secret|pem|key|log)
+          )$
+
+      - id: forbid-resource-readme-placeholders
+        name: forbid README placeholders in Pi resource directories
+        language: fail
+        entry: placeholder README.md is forbidden in scanned Pi resource directories
+        files: ^(?:extensions|skills|prompts|themes)/(?:.*/)?README\.md$

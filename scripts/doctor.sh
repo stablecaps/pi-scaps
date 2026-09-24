@@ -118,7 +118,7 @@ resolve_session_path() {
   if [[ "$configured_path" == "~" ]]; then
     [[ -n "${HOME-}" ]] || return 1
     printf '%s\n' "$HOME"
-  elif [[ "$configured_path" == '~/'* ]]; then
+  elif [[ "$configured_path" == \~/* ]]; then
     [[ -n "${HOME-}" ]] || return 1
     printf '%s/%s\n' "$HOME" "${configured_path:2}"
   elif [[ "$configured_path" == /* ]]; then
@@ -144,16 +144,19 @@ fi
 
 required_files=(
   .gitignore
+  .pre-commit-config.yaml
   AGENTS.md
   README.md
   settings.json
   models.json.example
   package.json
   package-lock.json
+  requirements-dev.txt
   agents/README.md
   scripts/bootstrap.sh
   scripts/doctor.sh
   scripts/update.sh
+  scripts/validate-contract.mjs
 )
 missing_files=()
 for required_file in "${required_files[@]}"; do

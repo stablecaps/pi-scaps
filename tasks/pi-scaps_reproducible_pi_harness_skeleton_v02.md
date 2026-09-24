@@ -216,6 +216,8 @@ pi-scaps/
 ├── package.json
 ├── package-lock.json
 ├── .gitignore
+├── .pre-commit-config.yaml
+├── requirements-dev.txt
 │
 ├── agents/
 │   └── README.md
@@ -235,6 +237,7 @@ pi-scaps/
 └── scripts/
     ├── bootstrap.sh
     ├── doctor.sh
+    ├── validate-contract.mjs
     └── update.sh
 ```
 
@@ -770,6 +773,14 @@ The script must:
 - avoid unpinned external upgrades;
 - return non-zero on failure.
 
+### 12.4 Standard pre-commit framework
+
+Use the Python `pre-commit` framework rather than maintaining a monolithic repository-specific Git hook. Pin the framework version in `requirements-dev.txt`, pin every hook repository revision in `.pre-commit-config.yaml`, and document the normal `pre-commit install` workflow.
+
+Use maintained upstream hooks for generic checks such as whitespace, end-of-file normalization, JSON and YAML parsing, merge markers, executable/shebang consistency, large files, private keys, and ShellCheck. Exclude `settings.json` from end-of-file normalization because its intentional initial serialization has no final newline.
+
+Keep local hooks narrowly limited to Pi-specific filename prohibitions, resource placeholder rules, the npm dependency tree, and a small cross-file metadata validator. The hooks must not call Pi, display secret contents, or implement a custom secret scanner. The first run may download the pinned hook environments.
+
 ---
 
 ## 13. README Requirements
@@ -795,6 +806,7 @@ Document:
 - Linux and Bash;
 - Node `>=24.21.0`;
 - Node 24 LTS version 24.21.0 or newer recommended for a new installation;
+- Python 3 only for the isolated developer pre-commit environment;
 - exact expected Pi version read from the repository contract;
 - initial pinned install command:
 
@@ -1007,6 +1019,8 @@ Initial platform:
 - Bash;
 - supported Node/npm installation;
 - current pinned Pi package.
+
+Python is an optional developer-tool prerequisite for the pinned `pre-commit` environment; it is not required to run Pi or the harness scripts.
 
 Do not implement PowerShell support in this task.
 
@@ -1231,6 +1245,9 @@ node -e 'JSON.parse(require("fs").readFileSync("settings.json", "utf8"))'
 node -e 'JSON.parse(require("fs").readFileSync("models.json.example", "utf8"))'
 
 bash -n scripts/bootstrap.sh scripts/doctor.sh scripts/update.sh
+
+.venv/bin/pre-commit validate-config
+.venv/bin/pre-commit run --all-files
 
 PI_CODING_AGENT_DIR="$PWD" ./scripts/bootstrap.sh
 PI_CODING_AGENT_DIR="$PWD" ./scripts/doctor.sh

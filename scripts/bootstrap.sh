@@ -17,6 +17,8 @@
 # Any failed prerequisite, malformed metadata, version mismatch, dependency
 # installation error, or filesystem error produces a non-zero exit status.
 
+# JavaScript passed to node -e intentionally uses literal single quotes.
+# shellcheck disable=SC2016
 set -euo pipefail
 
 # Print an error message and terminate with a failing status.
@@ -160,7 +162,7 @@ else
   printf 'INFO: package-lock.json not found; skipping npm ci.\n' >&2
 fi
 
-if [[ "$configured_session_dir" == '~/'* ]]; then
+if [[ "$configured_session_dir" == \~/* ]]; then
   session_dir="$HOME/${configured_session_dir:2}"
 elif [[ "$configured_session_dir" == /* ]]; then
   session_dir="$configured_session_dir"

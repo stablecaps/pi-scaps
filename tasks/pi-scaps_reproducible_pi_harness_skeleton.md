@@ -1041,4 +1041,3 @@ Compared with my **original harness outline**, these specific things did **not m
 The **two omissions I'd actually add to the PRD now** are **#1 session isolation** and **#11 Pi-version reproducibility**.
 
 And I'd probably upgrade **#6** too: eventually `doctor.sh` should verify that Pi can *actually discover/load* the declared resources, rather than merely confirming that `extensions/` exists. Those three materially improve the “clone anywhere and get the same harness” objective.
-

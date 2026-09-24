@@ -9,6 +9,7 @@ This repository is a portable, version-controlled global Pi harness. It is meant
 - Linux and Bash.
 - Node.js `>=24.21.0`; use Node 24.21.0 or newer.
 - npm.
+- Python 3 for the optional developer pre-commit environment.
 - `@earendil-works/pi-coding-agent` at the version pinned in `package.json` (currently `0.87.1`).
 
 Install the pinned Pi release explicitly:
@@ -60,6 +61,8 @@ This redirects Pi's whole global agent directory, including configuration and wr
 | `package.json` | Node requirement, authoritative Pi package/version contract, and future local extension dependencies. |
 | `package-lock.json` | npm-generated lockfile for deterministic local dependency installation. |
 | `.gitignore` | Guardrails excluding credentials, runtime state, managed installs, caches, and local-only files. |
+| `.pre-commit-config.yaml` | Pinned standard hooks, ShellCheck, and small local harness-specific checks. |
+| `requirements-dev.txt` | Exact Python `pre-commit` framework version for the developer hook environment. |
 | `extensions/` | In-repository TypeScript extensions discovered by Pi. Initially inert. |
 | `skills/` | Reusable skills discovered by Pi. Initially inert. |
 | `prompts/` | Reusable prompt templates discovered by Pi. Initially inert. |
@@ -70,6 +73,7 @@ This redirects Pi's whole global agent directory, including configuration and wr
 | `scripts/bootstrap.sh` | Validates prerequisites, installs locked local dependencies, and prepares the external session directory. |
 | `scripts/doctor.sh` | Checks activation, versions, configuration, resource structure, state separation, and offline Pi startup. |
 | `scripts/update.sh` | Fast-forwards a clean harness checkout, restores locked dependencies, and runs the doctor. |
+| `scripts/validate-contract.mjs` | Validates only the cross-file Node and Pi metadata relationships. |
 | `tasks/` | Versioned planning, review, and implementation-checklist material. |
 
 The empty resource directories contain only zero-content `.gitkeep` placeholders so Git preserves their structure. Pi also supports root `keybindings.json`, `SYSTEM.md`, and `APPEND_SYSTEM.md`; they are deliberately absent until a demonstrated need exists.
@@ -89,6 +93,21 @@ This includes `auth.json`, OAuth data, `.env` files, private keys, `sessions/`, 
 Sessions are configured to live at `~/.local/state/pi/sessions`, outside the checkout. If session history is wanted on another machine, transfer it separately through a private channel; it may contain sensitive prompts, paths, commands, and model output.
 
 Pi may legitimately rewrite tracked `settings.json` after a persisted settings change. Review the resulting diff, then intentionally commit it or revert it before updating the harness.
+
+## Pre-commit checks
+
+Create an isolated developer environment and install the exactly pinned framework:
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/pre-commit install
+.venv/bin/pre-commit run --all-files
+```
+
+If this clone previously used the superseded `.githooks/` hook, first run `git config --local --unset-all core.hooksPath`. New clones do not need that migration command.
+
+The pinned upstream hooks handle whitespace, line endings, JSON and YAML syntax, merge markers, large files, executable/shebang consistency, broken symlinks, private keys, and ShellCheck. Local hooks are limited to the Pi-specific metadata contract, forbidden Pi state paths, inert resource placeholders, and `npm ls --depth=0`. The first run downloads the pinned hook environments; hooks do not call Pi and do not replace GitHub secret scanning. `settings.json` is deliberately excluded from the end-of-file fixer because Pi initially serializes it without a final newline.
 
 ## Updating
 
