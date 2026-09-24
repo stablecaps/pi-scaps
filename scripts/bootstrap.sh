@@ -39,6 +39,7 @@ require_command() {
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 repo_root="$(cd -- "$script_dir/.." && pwd -P)"
 # shellcheck source=scripts/pi-npm-common.sh
+# shellcheck disable=SC1091
 source "$script_dir/pi-npm-common.sh"
 package_json="$repo_root/package.json"
 settings_json="$repo_root/settings.json"

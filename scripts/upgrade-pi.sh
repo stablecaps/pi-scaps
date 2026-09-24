@@ -38,6 +38,7 @@ json_string() {
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 repo_root="$(cd -- "$script_dir/.." && pwd -P)"
 # shellcheck source=scripts/pi-npm-common.sh
+# shellcheck disable=SC1091
 source "$script_dir/pi-npm-common.sh"
 
 [[ $# == 1 ]] || fail "Usage: ./scripts/upgrade-pi.sh <exact-version|latest>"
@@ -117,7 +118,8 @@ upgrade_stage=metadata
 node scripts/set-pi-version.mjs "$previous_version" "$candidate" || fail "Could not update Pi metadata"
 node scripts/validate-contract.mjs || fail "Candidate metadata fails the contract"
 npm ci || fail "Locked local dependency installation failed"
-git diff --quiet -- package-lock.json || fail "Pi-only upgrade unexpectedly changed package-lock.json"
+git diff --exit-code HEAD -- package-lock.json >/dev/null ||
+  fail "Pi-only upgrade unexpectedly changed package-lock.json"
 packages_before="$(node -e 'process.stdout.write(JSON.stringify(require("./settings.json").packages ?? []))')"
 package_count="$(node -e 'process.stdout.write(String(require("./settings.json").packages?.length ?? 0))')"
 if ((package_count > 0)); then
@@ -126,8 +128,10 @@ if ((package_count > 0)); then
   [[ "$packages_after" == "$packages_before" ]] || fail "Pi package pins changed during reconciliation"
   node scripts/validate-contract.mjs || fail "Reconciliation changed the contract"
 fi
-PI_CODING_AGENT_DIR="$repo_root" PI_OFFLINE=1 pi --help >/dev/null || fail "Candidate harness failed offline load check"
+node scripts/smoke-pi.mjs || fail "Candidate harness failed offline load check"
 PI_CODING_AGENT_DIR="$repo_root" ./scripts/doctor.sh || fail "Candidate failed doctor"
+git diff --exit-code HEAD -- package-lock.json >/dev/null ||
+  fail "Pi-only upgrade unexpectedly changed package-lock.json"
 
 changed_files="$(git diff --name-only)"
 printf '\nPi upgrade proposal verified: %s -> %s\n' "$previous_version" "$candidate"

@@ -71,6 +71,7 @@ This redirects Pi's whole global agent directory, including configuration and wr
 | `scripts/doctor.sh` | Checks activation, versions, configuration, resource structure, state separation, and offline Pi startup. |
 | `scripts/update.sh` | Fast-forwards a clean checkout, then uses bootstrap to converge Pi, locked dependencies, and pinned packages before doctor. |
 | `scripts/upgrade-pi.sh` | Proposes one explicit or npm-`latest` Pi version and leaves verified metadata changes for review. |
+| `scripts/smoke-pi.mjs` | Checks offline RPC startup and extension binding without sending a model prompt. |
 | `scripts/validate-contract.mjs` | Validates the Node/Pi contract and pinned package declarations; `--sync-pi-marker` updates the derived changelog marker after an intentional Pi pin change. |
 | `tasks/` | Versioned planning, review, and implementation-checklist material. |
 
@@ -139,6 +140,24 @@ changelog marker, reconciles locked dependencies and packages, and runs an
 offline load check plus doctor. It leaves changes unstaged for review and never
 commits or rolls back automatically. A Pi-only bump should not change
 `package-lock.json`.
+
+The smoke check's guarantee is that the configured harness reaches Pi's normal
+runtime and extension-binding path under the candidate version. It catches
+startup, import, registration, and dependency errors; it does not certify every
+extension's behavior. Registry resolution and pinned-package reconciliation
+happen before the offline check. The check sends no model prompt and suppresses
+raw Pi output that could contain local configuration details. This repository
+currently declares no root check/typecheck scripts or extension unit-test suite,
+so the upgrade command does not invent or run any. It never runs scripts found
+inside third-party packages as compatibility tests.
+
+Local extension dependencies belong in root `package.json` and
+`package-lock.json`; routine convergence uses `npm ci`. If an actual extension
+incompatibility requires changing one, update that dependency deliberately,
+regenerate and review the lockfile, and include it with the Pi bump only when
+the changes are related. Keep unrelated dependency refreshes separate. External
+Pi packages remain pinned in `settings.json` to exact npm versions or Git
+commits; reconciliation must not move those declarations.
 
 If an attempt fails after metadata changes, inspect the diff. To abandon an
 uncommitted proposal, restore only the files changed by the upgrade and

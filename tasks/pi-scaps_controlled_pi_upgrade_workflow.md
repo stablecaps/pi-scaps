@@ -337,43 +337,54 @@ installation; a separate uninstall step and rollback script are unnecessary.
 
 ### Group 5 — Add proportionate compatibility smoke checks
 
-- [ ] Define the baseline guarantee honestly as “the complete harness loads under the
+- [x] Define the baseline guarantee honestly as “the complete harness loads under the
   candidate Pi version,” not “all extension behavior is proven compatible.”
-- [ ] Run a non-interactive offline Pi invocation using this checkout as the active
+- [x] Run a non-interactive offline Pi invocation using this checkout as the active
   agent directory and without making a model request.
-- [ ] Keep registry access and pinned-package reconciliation in the preceding online
+- [x] Keep registry access and pinned-package reconciliation in the preceding online
   phase; do not make provider or network health part of the smoke result.
-- [ ] Fail on configuration errors, extension import/factory failures, missing
+- [x] Fail on configuration errors, extension import/factory failures, missing
   dependencies, registration conflicts, or other startup failures.
-- [ ] Run existing root-level typecheck/check commands only when the repository has
+- [x] Run existing root-level typecheck/check commands only when the repository has
   deliberately declared them as part of its own verification contract.
-- [ ] Do not discover and execute arbitrary scripts from installed third-party
+- [x] Do not discover and execute arbitrary scripts from installed third-party
   packages.
-- [ ] Do not require new unit tests for simple extensions. Add a focused semantic
+- [x] Do not require new unit tests for simple extensions. Add a focused semantic
   check later only when an important extension has behavior that a load check
   cannot cover and a demonstrated failure justifies it.
-- [ ] Keep smoke-check output useful without printing credentials or sensitive
+- [x] Keep smoke-check output useful without printing credentials or sensitive
   configuration contents.
 
 - [ ] **Group 5 complete:** an upgrade cannot succeed when the candidate fails to
   load the configured harness, without creating a general extension-test
   framework.
 
+The upgrade now uses an offline RPC startup smoke check. Pi's `--help` and
+`--list-models` paths exit before runtime diagnostics are checked, so they cannot
+establish the Group 5 guarantee. The RPC path reaches runtime diagnostics and
+extension binding before exiting on stdin EOF ([Pi startup source](https://github.com/earendil-works/pi/blob/v0.87.1/packages/coding-agent/src/main.ts),
+[Pi RPC source](https://github.com/earendil-works/pi/blob/v0.87.1/packages/coding-agent/src/modes/rpc/rpc-mode.ts)).
+A live candidate-Pi run remains for Group 8.
+
 ### Group 6 — Preserve dependency and lockfile semantics
 
 - [ ] Verify that a Pi-only bump leaves `package-lock.json` unchanged.
-- [ ] Keep `npm ci` as the normal local-dependency convergence command.
-- [ ] Extend the contract validation when external packages are introduced so every
+- [x] Keep `npm ci` as the normal local-dependency convergence command.
+- [x] Extend the contract validation when external packages are introduced so every
   npm source has an exact version and every Git source has an immutable ref.
-- [ ] If compatibility requires an extension dependency change, perform that change
+- [x] If compatibility requires an extension dependency change, perform that change
   deliberately, regenerate the lockfile through npm, and include it in the same
   reviewed upgrade only when causally related.
-- [ ] Keep unrelated dependency refreshes separate so failures remain attributable.
-- [ ] Reconcile currently declared exact external Pi packages only through supported
+- [x] Keep unrelated dependency refreshes separate so failures remain attributable.
+- [x] Reconcile currently declared exact external Pi packages only through supported
   Pi package behavior; do not move their pins implicitly.
 
 - [ ] **Group 6 complete:** Pi, local npm dependencies, and external Pi packages
   each retain a clear, reviewable source of truth.
+
+The upgrade command checks `package-lock.json` against `HEAD` before success,
+and `npm ci --offline` left the present lockfile unchanged. An actual Pi-only
+bump is still required to close the first checkbox and Group 6 acceptance.
 
 ### Group 7 — Align doctor and documentation
 
