@@ -4,14 +4,11 @@ Status: in progress
 
 This is the single execution checklist for implementing the Pi harness skeleton.
 
-Source documents:
+Source document:
 
-- [Original PRD](./pi-scaps_reproducible_pi_harness_skeleton.md) — original scope and provenance.
-- [Audited PRD Version 02](./pi-scaps_reproducible_pi_harness_skeleton_v02.md) — current implementation authority.
-- [Review findings](./pi-scaps_reproducible_pi_harness_review.md) — rationale for the Version 02 corrections.
-- [Full earlier answer](./missed_things.md) — source material behind the original PRD and review.
+- [PRD Version 02](./pi-scaps_reproducible_pi_harness_skeleton_v02.md) — current implementation authority.
 
-If the original PRD conflicts with Version 02, follow Version 02. This checklist does not replace either PRD; it turns the audited requirements into checkable work groups.
+This checklist does not replace the PRD; it turns its audited requirements into checkable work groups.
 
 ## How to use this checklist
 
