@@ -69,7 +69,8 @@ This redirects Pi's whole global agent directory, including configuration and wr
 | `scripts/` | Operator commands that are safe to invoke from any working directory. |
 | `scripts/bootstrap.sh` | Converges the declared npm-managed Pi, installs locked local dependencies, reconciles pinned external packages, and prepares the external session directory. |
 | `scripts/doctor.sh` | Checks activation, versions, configuration, resource structure, state separation, and offline Pi startup. |
-| `scripts/update.sh` | Fast-forwards a clean harness checkout, restores locked dependencies, and runs the doctor. |
+| `scripts/update.sh` | Fast-forwards a clean checkout, then uses bootstrap to converge Pi, locked dependencies, and pinned packages before doctor. |
+| `scripts/upgrade-pi.sh` | Proposes one explicit or npm-`latest` Pi version and leaves verified metadata changes for review. |
 | `scripts/validate-contract.mjs` | Validates the Node/Pi contract and pinned package declarations; `--sync-pi-marker` updates the derived changelog marker after an intentional Pi pin change. |
 | `tasks/` | Versioned planning, review, and implementation-checklist material. |
 
@@ -119,7 +120,35 @@ From a clean checkout, run:
 ./scripts/update.sh
 ```
 
-This fast-forwards the harness, installs its locked local dependencies, and runs the doctor. It does not update Pi itself or change the pinned Pi version. After a deliberate pin change, run bootstrap to install the new declared version before doctor. Routine update convergence is planned separately.
+This fast-forwards the harness, then runs bootstrap to install the exact Pi
+version already declared by the pulled revision, restore locked local
+dependencies, and reconcile pinned external packages. Doctor runs last. Update
+does not select a new Pi release or move any package pin.
+
+To propose a deliberate Pi version change from a clean, healthy checkout:
+
+```bash
+./scripts/upgrade-pi.sh latest
+# or: ./scripts/upgrade-pi.sh <exact-version>
+```
+
+An explicit prerelease is allowed; `latest` is rejected if npm points it at a
+prerelease. The command checks the candidate's Node requirement before changing
+anything, installs the exact candidate, updates only the Pi version and derived
+changelog marker, reconciles locked dependencies and packages, and runs an
+offline load check plus doctor. It leaves changes unstaged for review and never
+commits or rolls back automatically. A Pi-only bump should not change
+`package-lock.json`.
+
+If an attempt fails after metadata changes, inspect the diff. To abandon an
+uncommitted proposal, restore only the files changed by the upgrade and
+reconverge:
+
+```bash
+git restore --source=HEAD --staged --worktree -- package.json settings.json
+./scripts/bootstrap.sh
+./scripts/doctor.sh
+```
 
 ## Rollback
 

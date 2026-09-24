@@ -7,12 +7,12 @@
 #
 # The script locates the repository relative to its own path, refuses to proceed
 # when any tracked or untracked non-ignored change is present, pulls with
-# `git pull --ff-only`, reinstalls exactly the dependencies in package-lock.json
-# with `npm ci`, and runs the harness doctor. It updates only this Git-managed
-# harness: it never stashes local work, creates a merge commit, invokes
-# `pi update`, or silently changes the declared Pi version.
+# `git pull --ff-only`, runs bootstrap to install the pulled Pi pin and locked
+# dependencies and reconcile pinned packages, then runs the harness doctor.
+# It never stashes local work, creates a merge commit, selects a new Pi version,
+# or invokes an unbounded `pi update`.
 #
-# The command requires git and npm on PATH. Pull, dependency, or diagnostic
+# The command requires git, Node, and npm on PATH. Pull, dependency, or diagnostic
 # failures stop execution immediately and produce a non-zero exit status. A
 # successful run may replace node_modules according to the lockfile and prints a
 # single completion message after doctor succeeds.
@@ -41,7 +41,7 @@ fi
 
 cd -- "$repo_root"
 git pull --ff-only
-npm ci
-./scripts/doctor.sh
+./scripts/bootstrap.sh
+PI_CODING_AGENT_DIR="$repo_root" ./scripts/doctor.sh
 
 printf 'pi-scaps harness update complete.\n'

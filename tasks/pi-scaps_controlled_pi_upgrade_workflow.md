@@ -275,64 +275,64 @@ installation; a separate uninstall step and rollback script are unnecessary.
 
 ### Group 3 — Make routine update reconverge the machine
 
-- [ ] Preserve the clean-worktree requirement and `git pull --ff-only` behavior.
-- [ ] After pulling, ensure the exact Pi version now declared by the repository is
+- [x] Preserve the clean-worktree requirement and `git pull --ff-only` behavior.
+- [x] After pulling, ensure the exact Pi version now declared by the repository is
   installed automatically.
-- [ ] Restore local extension dependencies with `npm ci`.
-- [ ] Reconcile all declared external Pi packages without changing their pins.
-- [ ] Run doctor only after Pi and local dependencies match the pulled revision.
-- [ ] Do not run an unbounded `pi update`, select `latest`, or update external package
+- [x] Restore local extension dependencies with `npm ci`.
+- [x] Reconcile all declared external Pi packages without changing their pins.
+- [x] Run doctor only after Pi and local dependencies match the pulled revision.
+- [x] Do not run an unbounded `pi update`, select `latest`, or update external package
   pins during routine synchronisation.
-- [ ] Reuse bootstrap or a small shared mechanism where that is simpler than
+- [x] Reuse bootstrap or a small shared mechanism where that is simpler than
   duplicating version-install logic; do not introduce a framework for reuse.
 
-- [ ] **Group 3 complete:** after a reviewed Pi bump is merged,
+- [x] **Group 3 complete:** after a reviewed Pi bump is merged,
   `scripts/update.sh` on another machine converges to it without a manual npm
   command.
 
 ### Group 4 — Add the maintainer Pi-upgrade command
 
-- [ ] Add one documented command, provisionally `scripts/upgrade-pi.sh`, accepting an
+- [x] Add one documented command, provisionally `scripts/upgrade-pi.sh`, accepting an
   explicit version, including an explicitly requested prerelease, or the literal
   target `latest`.
-- [ ] Require a clean Git worktree before changing the global Pi installation or
+- [x] Require a clean Git worktree before changing the global Pi installation or
   tracked metadata.
-- [ ] Require the installed Pi version to match the current repository pin and run
+- [x] Require the installed Pi version to match the current repository pin and run
   doctor successfully before attempting an upgrade.
-- [ ] Resolve the npm registry's `latest` dist-tag once to an exact version and
+- [x] Resolve the npm registry's `latest` dist-tag once to an exact version and
   display the resolved value before mutation.
-- [ ] Treat an explicit prerelease as opt-in; never choose one through `latest`.
-- [ ] Read the candidate package's Node engine requirement before mutation and
+- [x] Treat an explicit prerelease as opt-in; never choose one through `latest`.
+- [x] Read the candidate package's Node engine requirement before mutation and
   verify that the installed Node version satisfies it.
-- [ ] If the candidate requires a higher Node minimum than the repository declares,
+- [x] If the candidate requires a higher Node minimum than the repository declares,
   stop before mutation and require a separate deliberate Node-contract update.
-- [ ] Record the previous declared and installed versions before mutation.
-- [ ] Verify that the active Pi executable is npm-managed and refuse to install a
+- [x] Record the previous declared and installed versions before mutation.
+- [x] Verify that the active Pi executable is npm-managed and refuse to install a
   second copy that would be shadowed on `PATH`.
-- [ ] Install the exact candidate through npm with `--ignore-scripts` and without
+- [x] Install the exact candidate through npm with `--ignore-scripts` and without
   using `sudo`.
-- [ ] Refresh shell command lookup and verify the active `pi --version` before
+- [x] Refresh shell command lookup and verify the active `pi --version` before
   changing tracked metadata.
-- [ ] Update the authoritative Pi pin and required derived metadata without unrelated
+- [x] Update the authoritative Pi pin and required derived metadata without unrelated
   JSON reformatting.
-- [ ] Write changed metadata atomically so interruption cannot leave malformed JSON.
-- [ ] Run `npm ci`, validate external package pins, and reconcile those packages
+- [x] Write changed metadata atomically so interruption cannot leave malformed JSON.
+- [x] Run `npm ci`, validate external package pins, and reconcile those packages
   before the offline smoke check.
-- [ ] Run the compatibility smoke checks in Group 5.
-- [ ] On candidate installation or post-installation version-verification failure,
+- [x] Run the compatibility smoke checks in Group 5.
+- [x] On candidate installation or post-installation version-verification failure,
   exit non-zero before changing metadata; report that the active global Pi state may
   need reconvergence through bootstrap.
-- [ ] On dependency reconciliation or smoke-check failure after metadata changes,
+- [x] On dependency reconciliation or smoke-check failure after metadata changes,
   exit non-zero while leaving the candidate installation and tracked proposal
   visible for diagnosis.
-- [ ] On every post-mutation failure, print the targeted uncommitted-recovery
+- [x] On every post-mutation failure, print the targeted uncommitted-recovery
   workflow without modifying Git or attempting live rollback.
-- [ ] On success, leave changes unstaged and uncommitted, and print a concise summary
+- [x] On success, leave changes unstaged and uncommitted, and print a concise summary
   of the old version, new version, changed files, verification result, and next
   review or recovery steps.
-- [ ] Treat an already-declared target as a successful no-op after verifying health.
+- [x] Treat an already-declared target as a successful no-op after verifying health.
 
-- [ ] **Group 4 complete:** one command can propose a reviewable Pi bump, and failed
+- [x] **Group 4 complete:** one command can propose a reviewable Pi bump, and failed
   attempts have an explicit, state-appropriate recovery path.
 
 ### Group 5 — Add proportionate compatibility smoke checks
