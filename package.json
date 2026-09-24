@@ -1,0 +1,13 @@
+{
+  "name": "pi-scaps",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reproducible personal Pi coding-agent harness",
+  "engines": {
+    "node": ">=24.21.0"
+  },
+  "piHarness": {
+    "package": "@earendil-works/pi-coding-agent",
+    "version": "0.87.1"
+  }
+}
