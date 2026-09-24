@@ -388,25 +388,25 @@ bump is still required to close the first checkbox and Group 6 acceptance.
 
 ### Group 7 — Align doctor and documentation
 
-- [ ] Keep doctor strict about the installed Pi version matching the repository pin.
-- [ ] Update doctor remediation to point to bootstrap/update rather than requiring a
+- [x] Keep doctor strict about the installed Pi version matching the repository pin.
+- [x] Update doctor remediation to point to bootstrap/update rather than requiring a
   copied manual installation command as the normal path.
-- [ ] Add `scripts/upgrade-pi.sh` to doctor's required-file and executable checks.
-- [ ] Document the difference between bootstrap, routine update, and maintainer
+- [x] Add `scripts/upgrade-pi.sh` to doctor's required-file and executable checks.
+- [x] Document the difference between bootstrap, routine update, and maintainer
   upgrade.
-- [ ] Document that only globally npm-installed Pi is supported and how conflicts
+- [x] Document that only globally npm-installed Pi is supported and how conflicts
   with other installation methods are reported.
-- [ ] Document that upgrade performs a load-time smoke check, not comprehensive
+- [x] Document that upgrade performs a load-time smoke check, not comprehensive
   behavioral certification.
-- [ ] Document registry-dependent preparation versus the offline smoke check.
-- [ ] Document uncommitted-attempt recovery and committed Git-revert recovery, with
+- [x] Document registry-dependent preparation versus the offline smoke check.
+- [x] Document uncommitted-attempt recovery and committed Git-revert recovery, with
   no live rollback or separate uninstall step.
-- [ ] Make uncommitted recovery restore both the index and worktree from `HEAD`, and
+- [x] Make uncommitted recovery restore both the index and worktree from `HEAD`, and
   require a clean worktree before committed `git revert` recovery.
-- [ ] Explain that Pi upgrades do not normally change the local dependency lockfile.
-- [ ] Keep all script-level and function documentation aligned with actual behavior.
+- [x] Explain that Pi upgrades do not normally change the local dependency lockfile.
+- [x] Keep all script-level and function documentation aligned with actual behavior.
 
-- [ ] **Group 7 complete:** an operator can choose the correct workflow without
+- [x] **Group 7 complete:** an operator can choose the correct workflow without
   understanding the scripts' implementation.
 
 ### Group 8 — Verification and handoff

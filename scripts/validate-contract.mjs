@@ -1,4 +1,6 @@
-/** Validate the checked-in Node/Pi contract; optionally sync Pi's derived marker. */
+/** Validate Node/Pi metadata, safe placeholders, and exact external package pins.
+ * Optionally sync Pi's derived changelog marker after an intentional pin edit.
+ */
 import { readFileSync, writeFileSync } from "node:fs";
 
 /** Read a checked-in JSON file. */

@@ -14,8 +14,10 @@ This repository is a portable, version-controlled global Pi harness. It is meant
 
 Bootstrap installs the exact Pi package/version declared in `package.json` through
 global npm, or reuses it when already correct. Only npm-managed Pi installations
-are supported; bootstrap refuses another `pi` executable shadowing that install.
-It never installs Node or uses `sudo`.
+are supported. If another installation shadows npm's `pi` executable, bootstrap
+and the maintainer upgrade command stop with an ownership error; remove that
+conflict from `PATH` or switch to the intended npm installation before retrying.
+They never install Node or use `sudo`.
 
 ## Fresh installation
 
@@ -71,6 +73,8 @@ This redirects Pi's whole global agent directory, including configuration and wr
 | `scripts/doctor.sh` | Checks activation, versions, configuration, resource structure, state separation, and offline Pi startup. |
 | `scripts/update.sh` | Fast-forwards a clean checkout, then uses bootstrap to converge Pi, locked dependencies, and pinned packages before doctor. |
 | `scripts/upgrade-pi.sh` | Proposes one explicit or npm-`latest` Pi version and leaves verified metadata changes for review. |
+| `scripts/pi-npm-common.sh` | Shared npm-ownership and Pi-version checks used by bootstrap and upgrade. |
+| `scripts/set-pi-version.mjs` | Atomically updates the Pi pin and derived changelog marker during a proposal. |
 | `scripts/smoke-pi.mjs` | Checks offline RPC startup and extension binding without sending a model prompt. |
 | `scripts/validate-contract.mjs` | Validates the Node/Pi contract and pinned package declarations; `--sync-pi-marker` updates the derived changelog marker after an intentional Pi pin change. |
 | `tasks/` | Versioned planning, review, and implementation-checklist material. |
@@ -83,10 +87,11 @@ Pi discovers global configuration and resources because this checkout is the act
 
 Dependencies imported directly by local extensions belong in root `package.json` and `package-lock.json`. External Pi packages are a separate concern: when deliberately introduced, declare them through Pi's package configuration and pin npm packages to exact versions and Git packages to immutable commits. The initial harness installs no external Pi packages.
 
-When deliberately changing the Pi pin, edit only the package/version in
-`package.json`, then run `node scripts/validate-contract.mjs --sync-pi-marker`
-to align Pi's required `settings.json.lastChangelogVersion` marker. The normal
-validator and pre-commit hook reject an unsynchronised marker.
+The maintainer upgrade command updates the authoritative Pi version in
+`package.json` and Pi's required `settings.json.lastChangelogVersion` marker
+together. If editing the pin manually, run
+`node scripts/validate-contract.mjs --sync-pi-marker` to align the marker. The
+normal validator and pre-commit hook reject an unsynchronised marker.
 
 ## Secrets and local state
 
@@ -113,7 +118,15 @@ If this clone previously used the superseded `.githooks/` hook, first run `git c
 
 The pinned upstream hooks handle whitespace, line endings, JSON and YAML syntax, merge markers, large files, executable/shebang consistency, broken symlinks, private keys, and ShellCheck. Local hooks are limited to the Pi-specific metadata contract, forbidden Pi state paths, inert resource placeholders, and `npm ls --depth=0`. The first run downloads the pinned hook environments; hooks do not call Pi and do not replace GitHub secret scanning. `settings.json` is deliberately excluded from the end-of-file fixer because Pi initially serializes it without a final newline.
 
-## Updating
+## Choosing a workflow
+
+Run `./scripts/bootstrap.sh` after a fresh clone or when this machine needs to
+match the Pi pin already in the checkout. It does not choose a newer release.
+Run `./scripts/update.sh` from a clean checkout to fast-forward Git, then run
+bootstrap and doctor against the pulled revision. Only a maintainer proposing
+a new Pi pin should run `./scripts/upgrade-pi.sh`.
+
+## Routine update and deliberate upgrade
 
 From a clean checkout, run:
 
@@ -159,9 +172,10 @@ the changes are related. Keep unrelated dependency refreshes separate. External
 Pi packages remain pinned in `settings.json` to exact npm versions or Git
 commits; reconciliation must not move those declarations.
 
-If an attempt fails after metadata changes, inspect the diff. To abandon an
-uncommitted proposal, restore only the files changed by the upgrade and
-reconverge:
+If installation fails before metadata changes, run bootstrap to reconverge the
+declared Pi version. If an attempt fails after metadata changes, inspect the
+diff first. To abandon an uncommitted proposal, restore only the files changed
+by the upgrade (including any staged copies) and reconverge:
 
 ```bash
 git restore --source=HEAD --staged --worktree -- package.json settings.json
@@ -169,15 +183,21 @@ git restore --source=HEAD --staged --worktree -- package.json settings.json
 ./scripts/doctor.sh
 ```
 
-## Rollback
+## Reverting a committed upgrade
 
-Inspect repository history and revert the unwanted change without rewriting shared history:
+Start from a clean worktree. Identify and revert the upgrade commit without
+rewriting shared history, then reinstall the version declared by the resulting
+checkout and run doctor:
 
 ```bash
 git log --oneline
-git revert <commit>
+git revert <pi-upgrade-commit>
+./scripts/bootstrap.sh
+./scripts/doctor.sh
 ```
 
+Neither recovery path performs live rollback or needs a separate Pi uninstall;
+bootstrap installs the exact version declared after restoration or revert.
 No special commit convention is required.
 
 ## Repository-owner security action

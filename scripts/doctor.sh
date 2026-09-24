@@ -9,9 +9,9 @@
 # The doctor validates the tracked harness structure, strict JSON metadata,
 # executable scripts, Node and pinned Pi versions, npm dependency consistency,
 # resource placeholders, external session storage, and the absence of tracked
-# credentials or runtime state. It also performs Pi's model-list diagnostic in
-# offline mode to prove that the active configuration can start without making
-# network health part of the result.
+# credentials or runtime state. Its offline model-list diagnostic checks basic
+# Pi startup without making network health part of the result; the upgrade
+# command's separate RPC smoke check verifies extension loading more fully.
 #
 # PI_CODING_AGENT_DIR selects the active agent directory; otherwise the default
 # is `$HOME/.pi/agent`. PI_CODING_AGENT_SESSION_DIR, when set, overrides the
@@ -155,7 +155,11 @@ required_files=(
   agents/README.md
   scripts/bootstrap.sh
   scripts/doctor.sh
+  scripts/pi-npm-common.sh
+  scripts/set-pi-version.mjs
+  scripts/smoke-pi.mjs
   scripts/update.sh
+  scripts/upgrade-pi.sh
   scripts/validate-contract.mjs
 )
 missing_files=()
@@ -199,7 +203,7 @@ else
 fi
 
 non_executable_scripts=()
-for script_name in bootstrap.sh doctor.sh update.sh; do
+for script_name in bootstrap.sh doctor.sh update.sh upgrade-pi.sh; do
   if [[ ! -x "$repo_root/scripts/$script_name" ]]; then
     non_executable_scripts+=("scripts/$script_name")
   fi
