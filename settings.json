@@ -2,5 +2,7 @@
   "lastChangelogVersion": "0.87.1",
   "defaultThinkingLevel": "medium",
   "sessionDir": "~/.local/state/pi/sessions",
-  "theme": "dark"
+  "theme": "dark",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.5"
 }

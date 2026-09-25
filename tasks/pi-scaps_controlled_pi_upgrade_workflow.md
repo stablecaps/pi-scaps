@@ -475,9 +475,14 @@ a no-op without a tracked diff. The registry's `latest` tag still resolves to
 `0.87.1`, so a real *latest-to-newer-version* upgrade cannot be exercised yet;
 Group 8 completion remains open for that release-specific check.
 
+On the operator's machine, bootstrap installed the declared `0.87.1` release
+through npm and doctor passed with this checkout activated as the agent
+directory. A new terminal initially selected nvm's Node 20 default; after
+selecting Node 24 as the default, the operator confirmed Pi runs there too.
+
 ## 7. Acceptance criteria
 
-- [ ] A fresh supported machine installs the exact repository-declared Pi version by
+- [x] A fresh supported machine installs the exact repository-declared Pi version by
   running bootstrap.
 - [ ] Every machine running routine update converges to the same Pi and locked local
   dependency versions.
