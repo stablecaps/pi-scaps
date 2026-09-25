@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Propose one deliberate Pi version upgrade, leaving an uncommitted reviewable diff.
-# Usage: ./scripts/upgrade-pi.sh <exact-version|latest>
+# Propose one deliberate Pi version or external package upgrade, leaving an uncommitted reviewable diff.
+# Usage: ./scripts/upgrade-pi.sh <exact-version|latest|--packages>
 # Requires a clean, healthy checkout and npm-managed Pi. Registry preparation may
 # use the network; the final Pi load and doctor checks run offline without a model.
 # Failures never alter Git history or roll back state automatically.
@@ -41,7 +41,7 @@ repo_root="$(cd -- "$script_dir/.." && pwd -P)"
 # shellcheck disable=SC1091
 source "$script_dir/pi-npm-common.sh"
 
-[[ $# == 1 ]] || fail "Usage: ./scripts/upgrade-pi.sh <exact-version|latest>"
+[[ $# == 1 ]] || fail "Usage: ./scripts/upgrade-pi.sh <exact-version|latest|--packages>"
 for required_command in git node npm readlink; do
   command -v "$required_command" >/dev/null 2>&1 || fail "Required command not found: $required_command"
 done
@@ -68,6 +68,31 @@ installed_version="$(read_pi_version)"
 PI_CODING_AGENT_DIR="$repo_root" ./scripts/doctor.sh || fail "Current harness is not healthy"
 
 target="$1"
+if [[ "$target" == --packages ]]; then
+  upgrade_stage=metadata
+  node scripts/pi-package-updates.mjs --upgrade || fail "Could not update external Pi package pins"
+  if git diff --quiet HEAD -- settings.json; then
+    printf 'External Pi packages are already current; doctor passed. No changes made.\n'
+    exit 0
+  fi
+
+  node scripts/validate-contract.mjs || fail "Updated external package metadata fails the contract"
+  packages_before="$(node -e 'process.stdout.write(JSON.stringify(require("./settings.json").packages ?? []))')"
+  PI_CODING_AGENT_DIR="$repo_root" pi update --extensions || fail "Updated Pi package reconciliation failed"
+  packages_after="$(node -e 'process.stdout.write(JSON.stringify(require("./settings.json").packages ?? []))')"
+  [[ "$packages_after" == "$packages_before" ]] || fail "Pi package pins changed during reconciliation"
+  node scripts/validate-contract.mjs || fail "Reconciliation changed the contract"
+  node scripts/smoke-pi.mjs || fail "Updated package harness failed offline load check"
+  PI_CODING_AGENT_DIR="$repo_root" ./scripts/doctor.sh || fail "Updated packages failed doctor"
+
+  changed_files="$(git diff --name-only)"
+  printf '\nExternal Pi package upgrade proposal verified.\n'
+  printf 'Changed files:\n%s\n' "$changed_files"
+  printf 'Offline load and doctor checks passed. Review the unstaged diff, then commit deliberately.\n'
+  printf 'To abandon: git restore --source=HEAD --staged --worktree -- settings.json; ./scripts/bootstrap.sh; ./scripts/doctor.sh\n'
+  exit 0
+fi
+
 if [[ "$target" == latest ]]; then
   latest_json="$(npm view "$pi_package" dist-tags.latest --json)" || fail "Could not resolve npm latest tag"
   candidate="$(printf '%s' "$latest_json" | json_string)" || fail "npm latest tag was not one version string"
@@ -138,3 +163,7 @@ printf '\nPi upgrade proposal verified: %s -> %s\n' "$previous_version" "$candid
 printf 'Changed files:\n%s\n' "$changed_files"
 printf 'Offline load and doctor checks passed. Review the unstaged diff, then commit deliberately.\n'
 printf 'To abandon: git restore --source=HEAD --staged --worktree -- package.json settings.json; ./scripts/bootstrap.sh; ./scripts/doctor.sh\n'
+printf '\nChecking external Pi package updates (advisory only).\n'
+if ! node scripts/pi-package-updates.mjs --check --advisory; then
+  printf 'WARNING: Could not check external Pi package updates. Run later: ./scripts/upgrade-pi.sh --packages\n' >&2
+fi

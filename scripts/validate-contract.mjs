@@ -2,6 +2,7 @@
  * Optionally sync Pi's derived changelog marker after an intentional pin edit.
  */
 import { readFileSync, writeFileSync } from "node:fs";
+import { readPackageEntries, validateExactPackageSource } from "./pi-package-common.mjs";
 
 /** Read a checked-in JSON file. */
 function readJson(path) {
@@ -16,24 +17,6 @@ function compareVersions(actual, required) {
     }
   }
   return 0;
-}
-
-/** Reject unpinned external Pi package declarations. */
-function validatePackages(packages) {
-  if (packages === undefined) return;
-  if (!Array.isArray(packages)) throw new Error("settings.json packages must be an array");
-
-  for (const entry of packages) {
-    const source = typeof entry === "string" ? entry : entry?.source;
-    if (typeof source !== "string") {
-      throw new Error("each Pi package must have a string source");
-    }
-    const exactNpm = /^npm:(?:@[a-z0-9][\w.-]*\/[a-z0-9][\w.-]*|[a-z0-9][\w.-]*)@\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
-    const immutableGit = /^git:.+@[0-9a-fA-F]{40}$/;
-    if (!exactNpm.test(source) && !immutableGit.test(source)) {
-      throw new Error(`Pi package source must use an exact npm version or Git commit: ${source}`);
-    }
-  }
 }
 
 try {
@@ -65,7 +48,9 @@ try {
   ) {
     throw new Error("package.json must declare one exact Pi package and version");
   }
-  validatePackages(settings.packages);
+  for (const entry of readPackageEntries().entries) {
+    validateExactPackageSource(entry);
+  }
 
   if (process.argv[2] === "--sync-pi-marker") {
     if (process.argv.length !== 3) throw new Error("unexpected arguments");

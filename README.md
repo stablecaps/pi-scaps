@@ -89,7 +89,7 @@ the startup file itself. Inside Pi, run `/login` if authentication is required.
 | `.gitignore` | Guardrails excluding credentials, runtime state, managed installs, caches, and local-only files. |
 | `.pre-commit-config.yaml` | Pinned standard hooks, ShellCheck, and small local harness-specific checks. |
 | `requirements-dev.txt` | Exact Python `pre-commit` framework version for the developer hook environment. |
-| `extensions/` | In-repository TypeScript extensions discovered by Pi. Initially inert. |
+| `extensions/` | Source directory for local, in-repository TypeScript extensions that Pi discovers directly. Initially inert. |
 | `skills/` | Reusable skills discovered by Pi. Initially inert. |
 | `prompts/` | Reusable prompt templates discovered by Pi. Initially inert. |
 | `themes/` | Custom themes discovered by Pi. Initially inert. |
@@ -110,9 +110,15 @@ The empty resource directories contain only zero-content `.gitkeep` placeholders
 
 ## Discovery and package semantics
 
-Pi discovers global configuration and resources because this checkout is the active agent directory. That differs from Pi's package-manifest mechanism: this repository intentionally has no root Pi package manifest or `pi-package` keyword, and installing it as a Pi package would not reproduce global settings or instructions.
+Pi loads this checkout as the active global agent directory. That is why root-level resources such as `settings.json`, `AGENTS.md`, `prompts/`, `skills/`, `themes/`, and `extensions/` are visible to Pi without this repository being installed as a package.
 
-Dependencies imported directly by local extensions belong in root `package.json` and `package-lock.json`. External Pi packages are a separate concern: when deliberately introduced, declare them through Pi's package configuration and pin npm packages to exact versions and Git packages to immutable commits. The initial harness installs no external Pi packages.
+The `extensions/` directory is therefore for extension source code that lives in this harness itself. If a custom TypeScript extension is written directly for this setup, its files go there and Pi discovers them from the active agent directory. The directory is empty except for `.gitkeep` until such a local extension exists.
+
+That is separate from Pi's package mechanism. External Pi extension packages are installed and reconciled as packages, not copied into `extensions/` as source. When deliberately introduced, external packages should be declared through Pi's package configuration and pinned to exact npm versions or immutable Git commits.
+
+This repository intentionally has no root Pi package manifest or `pi-package` keyword. Installing this repository as a Pi package would not reproduce its global settings, instructions, or resource-directory behavior.
+
+Dependencies imported directly by local in-repository extensions belong in root `package.json` and `package-lock.json`; external Pi packages remain governed by Pi package configuration. The initial harness installs no external Pi packages.
 
 The maintainer upgrade command updates the authoritative Pi version in
 `package.json` and Pi's required `settings.json.lastChangelogVersion` marker

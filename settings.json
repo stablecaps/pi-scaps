@@ -4,5 +4,26 @@
   "sessionDir": "~/.local/state/pi/sessions",
   "theme": "dark",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.5"
+  "defaultModel": "gpt-5.5",
+  "packages": [
+    {
+      "source": "git:github.com/angristan/pi-extensions@53ac3085d3165e0592335d802ec3d270201ede79",
+      "extensions": [
+        "-extensions/goal/index.ts",
+        "-extensions/herdr-process/index.ts",
+        "-extensions/herdr-tab-title/index.ts",
+        "-extensions/image-store/index.ts",
+        "-extensions/openai-codex-fast/index.ts",
+        "-extensions/petit-chat-input-bar/index.ts",
+        "-extensions/prevent-sleep/index.ts",
+        "-extensions/rename/index.ts",
+        "-extensions/reload-all/index.ts",
+        "-extensions/telegram/index.ts",
+        "-extensions/turn-separator/index.ts",
+        "-extensions/accent-color/index.ts",
+        "-extensions/context-management/index.ts",
+        "+extensions/footer/index.ts"
+      ]
+    }
+  ]
 }
