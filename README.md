@@ -97,10 +97,13 @@ the startup file itself. Inside Pi, run `/login` if authentication is required.
 | `agents/README.md` | Defines what a future role file may control and prevents mistaken auto-discovery assumptions. |
 | `scripts/` | Operator commands that are safe to invoke from any working directory. |
 | `scripts/bootstrap.sh` | Converges the declared npm-managed Pi, installs locked local dependencies, reconciles pinned external packages, and prepares the external session directory. |
-| `scripts/doctor.sh` | Checks activation, versions, configuration, resource structure, state separation, and offline Pi startup. |
+| `scripts/doctor.sh` | Checks runtime health: activation, command availability, pinned versions, dependencies, safe session storage, and offline Pi startup. |
 | `scripts/update.sh` | Fast-forwards a clean checkout, then uses bootstrap to converge Pi, locked dependencies, and pinned packages before doctor. |
-| `scripts/upgrade-pi.sh` | Proposes one explicit or npm-`latest` Pi version and leaves verified metadata changes for review. |
+| `scripts/upgrade-pi.sh` | Proposes one explicit or npm-`latest` Pi version, or `--packages` for external package pins, and leaves verified metadata changes for review. |
 | `scripts/pi-npm-common.sh` | Shared npm-ownership and Pi-version checks used by bootstrap and upgrade. |
+| `scripts/pi-package-common.mjs` | Shared parser, validation, and Git helpers for external Pi package pin workflows. |
+| `scripts/pi-package-updates.mjs` | Checks pinned Git Pi packages for upstream updates and updates pins for package-upgrade proposals. |
+| `scripts/pin-installed-pi-packages.mjs` | Pins unpinned installed Git Pi packages to the installed checkout commit. |
 | `scripts/set-pi-version.mjs` | Atomically updates the Pi pin and derived changelog marker during a proposal. |
 | `scripts/smoke-pi.mjs` | Checks offline RPC startup and extension binding without sending a model prompt. |
 | `scripts/validate-contract.mjs` | Validates the Node/Pi contract and pinned package declarations; `--sync-pi-marker` updates the derived changelog marker after an intentional Pi pin change. |
@@ -118,7 +121,7 @@ That is separate from Pi's package mechanism. External Pi extension packages are
 
 This repository intentionally has no root Pi package manifest or `pi-package` keyword. Installing this repository as a Pi package would not reproduce its global settings, instructions, or resource-directory behavior.
 
-Dependencies imported directly by local in-repository extensions belong in root `package.json` and `package-lock.json`; external Pi packages remain governed by Pi package configuration. The initial harness installs no external Pi packages.
+Dependencies imported directly by local in-repository extensions belong in root `package.json` and `package-lock.json`; external Pi packages remain governed by Pi package configuration in `settings.json` and are reconciled by the harness scripts.
 
 The maintainer upgrade command updates the authoritative Pi version in
 `package.json` and Pi's required `settings.json.lastChangelogVersion` marker
@@ -149,7 +152,7 @@ python3 -m venv .venv
 
 If this clone previously used the superseded `.githooks/` hook, first run `git config --local --unset-all core.hooksPath`. New clones do not need that migration command.
 
-The pinned upstream hooks handle whitespace, line endings, JSON and YAML syntax, merge markers, large files, executable/shebang consistency, broken symlinks, private keys, and ShellCheck. Local hooks are limited to the Pi-specific metadata contract, forbidden Pi state paths, inert resource placeholders, and `npm ls --depth=0`. The first run downloads the pinned hook environments; hooks do not call Pi and do not replace GitHub secret scanning. `settings.json` is deliberately excluded from the end-of-file fixer because Pi initially serializes it without a final newline.
+The pinned upstream hooks handle whitespace, line endings, JSON and YAML syntax, merge markers, large files, executable/shebang consistency, broken symlinks, private keys, and ShellCheck. Local hooks validate the Pi-specific metadata contract, forbidden Pi state paths, Node script syntax, placeholder README misuse in resource directories, and `npm ls --depth=0`. The first run downloads the pinned hook environments; hooks do not call Pi and do not replace GitHub secret scanning. `settings.json` is deliberately excluded from the end-of-file fixer because Pi initially serializes it without a final newline.
 
 ## Choosing a workflow
 
@@ -157,7 +160,7 @@ Run `./scripts/bootstrap.sh` after a fresh clone or when this machine needs to
 match the Pi pin already in the checkout. It does not choose a newer release.
 Run `./scripts/update.sh` from a clean checkout to fast-forward Git, then run
 bootstrap and doctor against the pulled revision. Only a maintainer proposing
-a new Pi pin should run `./scripts/upgrade-pi.sh`.
+a new Pi pin or external package pin update should run `./scripts/upgrade-pi.sh`.
 
 ## Routine update and deliberate upgrade
 
@@ -177,6 +180,7 @@ To propose a deliberate Pi version change from a clean, healthy checkout:
 ```bash
 ./scripts/upgrade-pi.sh latest
 # or: ./scripts/upgrade-pi.sh <exact-version>
+# or: ./scripts/upgrade-pi.sh --packages
 ```
 
 An explicit prerelease is allowed; `latest` is rejected if npm points it at a

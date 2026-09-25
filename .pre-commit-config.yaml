@@ -43,6 +43,13 @@ repos:
         pass_filenames: false
         always_run: true
 
+      - id: node-script-syntax
+        name: validate Node script syntax
+        entry: bash -c 'for script in scripts/*.mjs; do node --check "$script"; done'
+        language: system
+        pass_filenames: false
+        always_run: true
+
       - id: forbid-pi-runtime-state
         name: forbid tracked Pi credentials and runtime state
         language: fail

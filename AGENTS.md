@@ -14,4 +14,4 @@ This repository is the version-controlled global harness for Pi.
 - Never commit credentials, secrets, sessions, trust decisions, caches, or other runtime state.
 - Keep behavioral changes reproducible, reviewable, and documented.
 - Preserve pinned versions; update their documentation and verification together with any deliberate version change.
-- Before finalizing any task that changed files, inspect the diff and provide a ready-to-use multi-line commit message.
+- Before finalizing any task that changed files, inspect the diff and provide a ready-to-use multi-line commit message. If the change is trivial, a single line is fine.
