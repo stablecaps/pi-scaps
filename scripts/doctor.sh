@@ -156,6 +156,9 @@ required_files=(
   scripts/bootstrap.sh
   scripts/doctor.sh
   scripts/pi-npm-common.sh
+  scripts/pi-package-common.mjs
+  scripts/pi-package-updates.mjs
+  scripts/pin-installed-pi-packages.mjs
   scripts/set-pi-version.mjs
   scripts/smoke-pi.mjs
   scripts/update.sh
