@@ -1,5 +1,6 @@
 {
   "lastChangelogVersion": "0.87.1",
   "defaultThinkingLevel": "medium",
-  "sessionDir": "~/.local/state/pi/sessions"
+  "sessionDir": "~/.local/state/pi/sessions",
+  "theme": "dark"
 }
