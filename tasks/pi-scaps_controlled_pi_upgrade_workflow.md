@@ -355,7 +355,7 @@ installation; a separate uninstall step and rollback script are unnecessary.
 - [x] Keep smoke-check output useful without printing credentials or sensitive
   configuration contents.
 
-- [ ] **Group 5 complete:** an upgrade cannot succeed when the candidate fails to
+- [x] **Group 5 complete:** an upgrade cannot succeed when the candidate fails to
   load the configured harness, without creating a general extension-test
   framework.
 
@@ -364,11 +364,13 @@ The upgrade now uses an offline RPC startup smoke check. Pi's `--help` and
 establish the Group 5 guarantee. The RPC path reaches runtime diagnostics and
 extension binding before exiting on stdin EOF ([Pi startup source](https://github.com/earendil-works/pi/blob/v0.87.1/packages/coding-agent/src/main.ts),
 [Pi RPC source](https://github.com/earendil-works/pi/blob/v0.87.1/packages/coding-agent/src/modes/rpc/rpc-mode.ts)).
-A live candidate-Pi run remains for Group 8.
+The real pinned Pi binary passed the offline RPC smoke check in an isolated
+checkout. A deliberately broken extension made both Pi startup and the smoke
+check fail. A real version change also passed the smoke check in Group 8.
 
 ### Group 6 — Preserve dependency and lockfile semantics
 
-- [ ] Verify that a Pi-only bump leaves `package-lock.json` unchanged.
+- [x] Verify that a Pi-only bump leaves `package-lock.json` unchanged.
 - [x] Keep `npm ci` as the normal local-dependency convergence command.
 - [x] Extend the contract validation when external packages are introduced so every
   npm source has an exact version and every Git source has an immutable ref.
@@ -379,12 +381,12 @@ A live candidate-Pi run remains for Group 8.
 - [x] Reconcile currently declared exact external Pi packages only through supported
   Pi package behavior; do not move their pins implicitly.
 
-- [ ] **Group 6 complete:** Pi, local npm dependencies, and external Pi packages
+- [x] **Group 6 complete:** Pi, local npm dependencies, and external Pi packages
   each retain a clear, reviewable source of truth.
 
-The upgrade command checks `package-lock.json` against `HEAD` before success,
-and `npm ci --offline` left the present lockfile unchanged. An actual Pi-only
-bump is still required to close the first checkbox and Group 6 acceptance.
+The upgrade command checks `package-lock.json` against `HEAD` before success.
+An isolated real Pi-only bump from `0.87.0` to `0.87.1` changed only
+`package.json` and `settings.json`; `package-lock.json` remained unchanged.
 
 ### Group 7 — Align doctor and documentation
 
@@ -429,31 +431,49 @@ bump is still required to close the first checkbox and Group 6 acceptance.
   instructions without changing tracked metadata or Git history.
 - [x] Verify failed pinned-package reconciliation exits non-zero while leaving the
   candidate proposal available for diagnosis.
-- [ ] Verify failed harness loading exits non-zero while leaving the candidate and
+- [x] Verify failed harness loading exits non-zero while leaving the candidate and
   proposed metadata available for diagnosis.
-- [ ] Verify a successful upgrade leaves only the expected reviewable metadata and
+- [x] Verify a successful upgrade leaves only the expected reviewable metadata and
   documentation diff.
-- [ ] In a controlled checkout, verify targeted restoration of an uncommitted attempt
+- [x] In a controlled checkout, verify targeted restoration of an uncommitted attempt
   followed by bootstrap reinstalls the committed Pi version.
-- [ ] In a disposable repository, verify reverting a committed upgrade followed by
+- [x] In a disposable repository, verify reverting a committed upgrade followed by
   bootstrap reinstalls the previous Pi version and configuration.
-- [ ] Verify no Pi-only upgrade changes `package-lock.json`.
-- [ ] Verify bootstrap and routine update reconcile pinned external packages without
+- [x] Verify no Pi-only upgrade changes `package-lock.json`.
+- [x] Verify bootstrap and routine update reconcile pinned external packages without
   moving their declarations.
-- [ ] Verify no command commits, pushes, stashes, intentionally reads or prints
+- [x] Verify no command commits, pushes, stashes, intentionally reads or prints
   provider credentials, or invokes a model.
-- [ ] Re-run doctor twice and confirm the successful state is idempotent.
-- [ ] Record any environment-limited checks rather than weakening their acceptance
+- [x] Re-run doctor twice and confirm the successful state is idempotent.
+- [x] Record any environment-limited checks rather than weakening their acceptance
   criteria.
+- [ ] When npm `latest` advances beyond the repository pin, verify a real
+  `upgrade-pi.sh latest` proposal in a controlled checkout.
 
 - [ ] **Group 8 complete:** fresh install, routine synchronisation, successful
   upgrade, failed upgrade, and explicit recovery paths behave as documented.
 
-The first nine checks passed on 2026-09-25. Full pinned pre-commit, Bash/Node
+The controlled checks passed on 2026-09-25. Full pinned pre-commit, Bash/Node
 syntax, contract, and whitespace checks passed in this checkout. Disposable
 local Git clones with fake npm and Pi executables exercised installation,
-ownership, update, candidate selection, Node-engine gates, and failure states;
-these do not replace a real registry-backed Pi upgrade check.
+ownership, update, candidate selection, Node-engine gates, failure states,
+reviewable diffs, both recovery paths, lockfile stability, pinned-package
+reconciliation, and repeated doctor runs. Script inspection found no automatic
+Git commits/pushes/stashes, intentional credential reads or prints, or model
+requests. These checks do not replace a real registry-backed Pi upgrade.
+
+The real `@earendil-works/pi-coding-agent` binary was installed into an
+isolated temporary npm prefix. The pinned `0.87.1` passed the offline harness
+smoke check; a deliberately broken extension caused the check to fail. A
+fresh-prefix bootstrap installed `0.87.1`. In a disposable clone, an explicit
+`0.87.1` to `0.87.0` version change, targeted uncommitted restoration plus
+bootstrap, an explicit `0.87.0` to `0.87.1` bump, and a committed Git revert
+plus bootstrap all succeeded with real Pi packages. The bump changed only
+`package.json` and `settings.json`, not `package-lock.json`. Running
+`upgrade-pi.sh latest` against a healthy `0.87.1` installation completed as
+a no-op without a tracked diff. The registry's `latest` tag still resolves to
+`0.87.1`, so a real *latest-to-newer-version* upgrade cannot be exercised yet;
+Group 8 completion remains open for that release-specific check.
 
 ## 7. Acceptance criteria
 

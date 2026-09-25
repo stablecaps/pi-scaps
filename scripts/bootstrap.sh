@@ -10,6 +10,8 @@
 # from settings.json. It checks Node, converges the globally npm-managed Pi to
 # the exact declared version, installs locked dependencies, reconciles pinned
 # external Pi packages, and creates the configured session directory.
+# When the checkout is outside Pi's default agent directory, it prints the
+# activation command and explains how to keep that setting in future shells.
 #
 # HOME is used to expand a sessionDir beginning with `~/`. The script is
 # intentionally safe to repeat: it does not install Node, write credentials,
@@ -155,6 +157,16 @@ fi
 mkdir -p -- "$session_dir"
 
 printf '\npi-scaps bootstrap complete.\n\n'
+default_agent_dir="$HOME/.pi/agent"
+if [[ -d "$default_agent_dir" ]]; then
+  default_agent_dir="$(cd -- "$default_agent_dir" && pwd -P)"
+fi
+if [[ "$repo_root" != "$default_agent_dir" ]]; then
+  printf 'This checkout is not Pi\047s default agent directory. To use it in this shell, run:\n'
+  printf '  export PI_CODING_AGENT_DIR=%q\n' "$repo_root"
+  printf 'For future shells, add that export line to your shell startup file (for Bash, ~/.bashrc).\n'
+  printf 'Bootstrap does not change your shell configuration.\n\n'
+fi
 printf 'Next:\n'
 printf '  1. Run ./scripts/doctor.sh\n'
 printf '  2. Start Pi with: pi\n'

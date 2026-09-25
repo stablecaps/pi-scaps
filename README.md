@@ -4,6 +4,11 @@ Reproducible personal configuration and extensions for the Pi coding agent.
 
 This repository is a portable, version-controlled global Pi harness. It is meant to be used directly as Pi's global agent directory; it is not a conventional application or a separately installable Pi package.
 
+Pi itself is installed globally through npm. This repository is the agent
+directory Pi loads: it contains the settings, agents, prompts, skills, and
+extensions as well as the pinned version contract. Installing Pi does not
+automatically select a checkout as its agent directory.
+
 ## Prerequisites
 
 - Linux and Bash.
@@ -19,7 +24,7 @@ and the maintainer upgrade command stop with an ownership error; remove that
 conflict from `PATH` or switch to the intended npm installation before retrying.
 They never install Node or use `sudo`.
 
-## Fresh installation
+## Fresh installation at Pi's default path
 
 Install the prerequisites first, then ensure `~/.pi/agent` does not already exist and run:
 
@@ -33,21 +38,43 @@ pi
 
 Inside Pi, run `/login` if authentication is required. Credentials remain local and must never be committed.
 
+Because this checkout is at Pi's default `~/.pi/agent` path, no
+`PI_CODING_AGENT_DIR` setting is needed in this case.
+
 ## If `~/.pi/agent` already exists
 
 Stop before cloning. Back up the existing directory to a private, dated location, inspect its contents, and create a clean clone only after the original is safe. Manually merge only intentional, non-secret configuration into the clone; do not copy credentials, runtime state, downloaded packages, or caches. Authenticate again with `/login` if needed.
 
 The repository scripts do not delete, replace, or merge an existing agent directory.
 
-## Alternative agent directory
+## Using an existing checkout elsewhere
 
-The default and recommended location is `~/.pi/agent`. To use another checkout for the current shell:
+If this repository is already checked out somewhere other than `~/.pi/agent`,
+keep that checkout and run the following from a terminal. Replace the first
+line's example path with the actual checkout path:
 
 ```bash
-export PI_CODING_AGENT_DIR="$HOME/src/pi-scaps"
+cd /path/to/pi-scaps
+export PI_CODING_AGENT_DIR="$PWD"
+./scripts/bootstrap.sh
+./scripts/doctor.sh
+pi
 ```
 
-This redirects Pi's whole global agent directory, including configuration and writable state such as credentials, locks, diagnostics, trust data, caches, and managed packages. It is not only a source-code lookup path. The configured session directory remains separate unless `PI_CODING_AGENT_SESSION_DIR` overrides it.
+`bootstrap.sh` installs the repository's pinned Pi version and locked local
+dependencies, but it cannot set an environment variable in the parent shell.
+The `export` above selects this checkout for Pi and doctor in the current
+terminal only. It redirects Pi's whole global agent directory, including
+configuration and writable state such as credentials, locks, diagnostics,
+trust data, caches, and managed packages. The configured session directory
+remains separate unless `PI_CODING_AGENT_SESSION_DIR` overrides it.
+
+Bootstrap also prints the exact export command for this checkout. To use the
+same agent directory in future Bash terminals, add that printed command,
+which contains the **absolute checkout path**, to `~/.bashrc`. Do not put
+`export PI_CODING_AGENT_DIR="$PWD"` in `~/.bashrc`: there, `$PWD` would mean
+whichever directory a new terminal happens to start in. Bootstrap never edits
+the startup file itself. Inside Pi, run `/login` if authentication is required.
 
 ## Repository layout
 
