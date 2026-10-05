@@ -8,6 +8,6 @@
   },
   "piHarness": {
     "package": "@earendil-works/pi-coding-agent",
-    "version": "0.87.1"
+    "version": "1.0.3"
   }
 }
