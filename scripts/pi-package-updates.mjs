@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -7,19 +6,12 @@ import {
   parseGitSource,
   readPackageEntries,
   remoteHead,
+  updatePackageEntrySource,
+  writeSettings,
 } from "./helpers/pi-package-common.mjs";
 
 function usage() {
   return "Usage: node scripts/pi-package-updates.mjs (--check [--advisory] | --upgrade)";
-}
-
-function replaceOnce(text, oldValue, newValue, location) {
-  const oldJson = JSON.stringify(oldValue);
-  const newJson = JSON.stringify(newValue);
-  if (!text.includes(oldJson)) {
-    throw new PiPackageError(`${location}\nCould not find the package source text while updating settings.json:\n  ${oldValue}`);
-  }
-  return text.replace(oldJson, newJson);
 }
 
 async function main() {
@@ -33,7 +25,7 @@ async function main() {
   if (advisory && !check) throw new PiPackageError("--advisory can only be used with --check");
 
   const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-  const { settingsPath, settingsText, entries } = readPackageEntries(repoRoot);
+  const { settingsPath, settings, entries } = readPackageEntries(repoRoot);
   const gitEntries = entries
     .map((entry) => ({ entry, git: parseGitSource(entry.source) }))
     .filter(({ git }) => git?.isPinned);
@@ -85,11 +77,10 @@ async function main() {
     return 0;
   }
 
-  let updatedText = settingsText;
   for (const item of updates) {
-    updatedText = replaceOnce(updatedText, item.entry.source, item.nextSource, item.entry.location);
+    updatePackageEntrySource(settings, item.entry, item.nextSource);
   }
-  writeFileSync(settingsPath, updatedText);
+  writeSettings(settingsPath, settings);
 
   console.log("Updated external Pi package pin(s) in settings.json:");
   for (const item of updates) {

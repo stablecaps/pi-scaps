@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -79,6 +79,34 @@ export function readPackageEntries(repoRoot = process.cwd()) {
   });
 
   return { settingsPath: path, settingsText: text, settings, entries };
+}
+
+export function updatePackageEntrySource(settings, entry, nextSource) {
+  if (!Array.isArray(settings.packages)) {
+    throw new PiPackageError("settings.json packages must be an array");
+  }
+  if (typeof nextSource !== "string" || nextSource.length === 0) {
+    throw new PiPackageError(`${entry.location}\nReplacement package source must be a non-empty string`);
+  }
+
+  const current = settings.packages[entry.index];
+  if (typeof current === "string") {
+    if (current !== entry.source) {
+      throw new PiPackageError(`${entry.location}\nPackage source changed before update could be applied:\n  expected: ${entry.source}\n  actual: ${current}`);
+    }
+    settings.packages[entry.index] = nextSource;
+    return;
+  }
+
+  if (!current || typeof current !== "object" || Array.isArray(current) || current.source !== entry.source) {
+    const actual = current && typeof current === "object" && !Array.isArray(current) ? current.source : current;
+    throw new PiPackageError(`${entry.location}\nPackage source changed before update could be applied:\n  expected: ${entry.source}\n  actual: ${typeof actual === "string" ? actual : JSON.stringify(actual)}`);
+  }
+  current.source = nextSource;
+}
+
+export function writeSettings(settingsPath, settings) {
+  writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
 }
 
 export function parseGitSource(source) {

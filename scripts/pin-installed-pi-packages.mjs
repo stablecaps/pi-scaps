@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -7,12 +6,13 @@ import {
   installedGitHead,
   parseGitSource,
   readPackageEntries,
+  updatePackageEntrySource,
+  writeSettings,
 } from "./helpers/pi-package-common.mjs";
 
 try {
   const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-  const { settingsPath, settingsText, entries } = readPackageEntries(repoRoot);
-  let updatedText = settingsText;
+  const { settingsPath, settings, entries } = readPackageEntries(repoRoot);
   const changes = [];
 
   for (const entry of entries) {
@@ -21,13 +21,7 @@ try {
 
     const installed = installedGitHead(repoRoot, entry);
     const pinnedSource = `${git.unpinnedSource}@${installed.sha}`;
-    const oldJson = JSON.stringify(entry.source);
-    const newJson = JSON.stringify(pinnedSource);
-
-    if (!updatedText.includes(oldJson)) {
-      throw new PiPackageError(`${entry.location}\nCould not find the package source text while updating settings.json:\n  ${entry.source}`);
-    }
-    updatedText = updatedText.replace(oldJson, newJson);
+    updatePackageEntrySource(settings, entry, pinnedSource);
     changes.push({ entry, installed, pinnedSource });
   }
 
@@ -36,7 +30,7 @@ try {
     process.exit(0);
   }
 
-  writeFileSync(settingsPath, updatedText);
+  writeSettings(settingsPath, settings);
   console.log("Pinned installed Git Pi package source(s) in settings.json:");
   for (const change of changes) {
     console.log(`\n${change.entry.location}`);
