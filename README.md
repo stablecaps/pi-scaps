@@ -125,6 +125,10 @@ This repository intentionally has no root Pi package manifest or `pi-package` ke
 
 Dependencies imported directly by local in-repository extensions belong in root `package.json` and `package-lock.json`; external Pi packages remain governed by Pi package configuration in `settings.json` and are reconciled by the harness scripts.
 
+External package sources in `settings.json` must be reproducible: npm packages use exact versions and Git packages use 40-character commit pins. Bootstrap and routine update reconcile those pinned packages onto the local machine but do not choose newer package revisions or move pins.
+
+To add a Git package that was first installed without a commit pin, reconcile it locally and then run `node scripts/pin-installed-pi-packages.mjs`; the script updates the package entry to the installed checkout commit. To deliberately move existing Git package pins to upstream `HEAD`, run `./scripts/upgrade-pi.sh --packages` from a clean, healthy checkout. That mode updates only package pins, reconciles the package checkout, verifies offline startup, and leaves the diff for review.
+
 The maintainer upgrade command updates the authoritative Pi version in
 `package.json` and Pi's required `settings.json.lastChangelogVersion` marker
 together. If editing the pin manually, run
@@ -182,7 +186,6 @@ To propose a deliberate Pi version change from a clean, healthy checkout:
 ```bash
 ./scripts/upgrade-pi.sh latest
 # or: ./scripts/upgrade-pi.sh <exact-version>
-# or: ./scripts/upgrade-pi.sh --packages
 ```
 
 An explicit prerelease is allowed; `latest` is rejected if npm points it at a
@@ -191,7 +194,18 @@ anything, installs the exact candidate, updates only the Pi version and derived
 changelog marker, reconciles locked dependencies and packages, and runs an
 offline load check plus doctor. It leaves changes unstaged for review and never
 commits or rolls back automatically. A Pi-only bump should not change
-`package-lock.json`.
+`package-lock.json`. Normal Pi version proposals finish by reporting available
+external Git package updates as advisory information only.
+
+To propose a deliberate external Git package pin update instead:
+
+```bash
+./scripts/upgrade-pi.sh --packages
+```
+
+This checks remote `HEAD` for pinned Git packages, updates `settings.json` pins
+when newer commits exist, reconciles those packages with Pi, then runs the same
+offline load and doctor checks. It does not change the Pi version.
 
 The smoke check's guarantee is that the configured harness reaches Pi's normal
 runtime and extension-binding path under the candidate version. It catches
