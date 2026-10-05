@@ -9,7 +9,7 @@ import { spawnSync } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const result = spawnSync("pi", ["--mode", "rpc", "--no-session", "--offline"], {
   cwd: repoRoot,
   env: { ...process.env, PI_CODING_AGENT_DIR: repoRoot, PI_OFFLINE: "1" },
