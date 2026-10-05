@@ -6,10 +6,16 @@
  * sensitive details; the operator can run the printed command to diagnose.
  */
 import { spawnSync } from "node:child_process";
-import { dirname, resolve } from "node:path";
+import { existsSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+if (!existsSync(join(repoRoot, "package.json")) || !existsSync(join(repoRoot, "settings.json"))) {
+  console.error(`Pi offline harness smoke check: ${repoRoot} is not the harness root (package.json and settings.json required). Pi was not started.`);
+  process.exit(1);
+}
+
 const result = spawnSync("pi", ["--mode", "rpc", "--no-session", "--offline"], {
   cwd: repoRoot,
   env: { ...process.env, PI_CODING_AGENT_DIR: repoRoot, PI_OFFLINE: "1" },
