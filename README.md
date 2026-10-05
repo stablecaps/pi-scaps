@@ -83,6 +83,7 @@ the startup file itself. Inside Pi, run `/login` if authentication is required.
 | `README.md` | Installation, operation, recovery, and safety guidance. |
 | `AGENTS.md` | Short global instructions loaded for every Pi session. |
 | `settings.json` | Portable Pi settings, including the external session directory and changelog marker. |
+| `keybindings.json` | Custom Pi terminal and application keybindings. |
 | `models.json.example` | Safe schema example for an optional, ignored local `models.json`. |
 | `package.json` | Node requirement, authoritative Pi package/version contract, and future local extension dependencies. |
 | `package-lock.json` | npm-generated lockfile for deterministic local dependency installation. |
@@ -111,7 +112,7 @@ the startup file itself. Inside Pi, run `/login` if authentication is required.
 | `scripts/checks/validate-contract.mjs` | Validates the Node/Pi contract and pinned package declarations; `--sync-pi-marker` updates the derived changelog marker after an intentional Pi pin change. |
 | `tasks/` | Versioned planning, review, and implementation-checklist material. |
 
-The empty resource directories contain only zero-content `.gitkeep` placeholders so Git preserves their structure. Pi also supports root `keybindings.json`, `SYSTEM.md`, and `APPEND_SYSTEM.md`; they are deliberately absent until a demonstrated need exists.
+The empty resource directories contain only zero-content `.gitkeep` placeholders so Git preserves their structure. Pi also supports root `SYSTEM.md` and `APPEND_SYSTEM.md`; they are deliberately absent until a demonstrated need exists.
 
 ## Discovery and package semantics
 
