@@ -7,7 +7,7 @@ import {
   parseGitSource,
   readPackageEntries,
   remoteHead,
-} from "./pi-package-common.mjs";
+} from "./helpers/pi-package-common.mjs";
 
 function usage() {
   return "Usage: node scripts/pi-package-updates.mjs (--check [--advisory] | --upgrade)";

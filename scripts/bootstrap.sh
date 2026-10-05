@@ -40,9 +40,9 @@ require_command() {
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 repo_root="$(cd -- "$script_dir/.." && pwd -P)"
-# shellcheck source=scripts/pi-npm-common.sh
+# shellcheck source=scripts/helpers/pi-npm-common.sh
 # shellcheck disable=SC1091
-source "$script_dir/pi-npm-common.sh"
+source "$script_dir/helpers/pi-npm-common.sh"
 package_json="$repo_root/package.json"
 settings_json="$repo_root/settings.json"
 
@@ -106,7 +106,7 @@ fi
 
 npm_version="$(npm --version)"
 cd -- "$repo_root"
-node scripts/validate-contract.mjs || fail "Harness contract is invalid"
+node scripts/checks/validate-contract.mjs || fail "Harness contract is invalid"
 
 check_pi_ownership "$pi_package"
 actual_pi_version=""
@@ -141,7 +141,7 @@ external_package_count="$(node -e 'const settings = require("./settings.json"); 
 if ((external_package_count > 0)); then
   printf 'Reconciling %s pinned external Pi package(s).\n' "$external_package_count"
   PI_CODING_AGENT_DIR="$repo_root" pi update --extensions || fail "Pinned Pi package reconciliation failed"
-  node scripts/validate-contract.mjs || fail "Pi package reconciliation changed the declared contract"
+  node scripts/checks/validate-contract.mjs || fail "Pi package reconciliation changed the declared contract"
   external_packages_after="$(node -e 'const settings = require("./settings.json"); process.stdout.write(JSON.stringify(settings.packages ?? []))')"
   [[ "$external_packages_after" == "$external_packages_before" ]] ||
     fail "Pi package reconciliation changed the declared package set or pins"

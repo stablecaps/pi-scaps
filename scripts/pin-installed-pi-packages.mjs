@@ -7,7 +7,7 @@ import {
   installedGitHead,
   parseGitSource,
   readPackageEntries,
-} from "./pi-package-common.mjs";
+} from "./helpers/pi-package-common.mjs";
 
 try {
   const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");

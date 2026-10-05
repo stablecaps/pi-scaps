@@ -100,13 +100,15 @@ the startup file itself. Inside Pi, run `/login` if authentication is required.
 | `scripts/doctor.sh` | Checks runtime health: activation, command availability, pinned versions, dependencies, safe session storage, and offline Pi startup. |
 | `scripts/update.sh` | Fast-forwards a clean checkout, then uses bootstrap to converge Pi, locked dependencies, and pinned packages before doctor. |
 | `scripts/upgrade-pi.sh` | Proposes one explicit or npm-`latest` Pi version, or `--packages` for external package pins, and leaves verified metadata changes for review. |
-| `scripts/pi-npm-common.sh` | Shared npm-ownership and Pi-version checks used by bootstrap and upgrade. |
-| `scripts/pi-package-common.mjs` | Shared parser, validation, and Git helpers for external Pi package pin workflows. |
 | `scripts/pi-package-updates.mjs` | Checks pinned Git Pi packages for upstream updates and updates pins for package-upgrade proposals. |
 | `scripts/pin-installed-pi-packages.mjs` | Pins unpinned installed Git Pi packages to the installed checkout commit. |
-| `scripts/set-pi-version.mjs` | Atomically updates the Pi pin and derived changelog marker during a proposal. |
-| `scripts/smoke-pi.mjs` | Checks offline RPC startup and extension binding without sending a model prompt. |
-| `scripts/validate-contract.mjs` | Validates the Node/Pi contract and pinned package declarations; `--sync-pi-marker` updates the derived changelog marker after an intentional Pi pin change. |
+| `scripts/helpers/` | Implementation helpers used by operator and package workflow scripts. |
+| `scripts/helpers/pi-npm-common.sh` | Shared npm-ownership and Pi-version checks used by bootstrap and upgrade. |
+| `scripts/helpers/pi-package-common.mjs` | Shared parser, validation, and Git helpers for external Pi package pin workflows. |
+| `scripts/helpers/set-pi-version.mjs` | Atomically updates the Pi pin and derived changelog marker during a proposal. |
+| `scripts/helpers/smoke-pi.mjs` | Checks offline RPC startup and extension binding without sending a model prompt. |
+| `scripts/checks/` | Static validation scripts used by pre-commit and maintainer workflows. |
+| `scripts/checks/validate-contract.mjs` | Validates the Node/Pi contract and pinned package declarations; `--sync-pi-marker` updates the derived changelog marker after an intentional Pi pin change. |
 | `tasks/` | Versioned planning, review, and implementation-checklist material. |
 
 The empty resource directories contain only zero-content `.gitkeep` placeholders so Git preserves their structure. Pi also supports root `keybindings.json`, `SYSTEM.md`, and `APPEND_SYSTEM.md`; they are deliberately absent until a demonstrated need exists.
@@ -126,7 +128,7 @@ Dependencies imported directly by local in-repository extensions belong in root 
 The maintainer upgrade command updates the authoritative Pi version in
 `package.json` and Pi's required `settings.json.lastChangelogVersion` marker
 together. If editing the pin manually, run
-`node scripts/validate-contract.mjs --sync-pi-marker` to align the marker. The
+`node scripts/checks/validate-contract.mjs --sync-pi-marker` to align the marker. The
 normal validator and pre-commit hook reject an unsynchronised marker.
 
 ## Secrets and local state

@@ -31,7 +31,7 @@ repos:
     hooks:
       - id: pi-harness-contract
         name: validate Pi harness contract and package pins
-        entry: node scripts/validate-contract.mjs
+        entry: node scripts/checks/validate-contract.mjs
         language: system
         pass_filenames: false
         always_run: true
@@ -45,7 +45,7 @@ repos:
 
       - id: node-script-syntax
         name: validate Node script syntax
-        entry: bash -c 'for script in scripts/*.mjs; do node --check "$script"; done'
+        entry: bash -c 'find scripts -type f -name "*.mjs" -print0 | xargs -0 -r -n1 node --check'
         language: system
         pass_filenames: false
         always_run: true

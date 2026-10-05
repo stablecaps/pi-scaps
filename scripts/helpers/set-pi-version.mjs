@@ -32,7 +32,7 @@ function writeAtomic(path, contents) {
 try {
   const [oldVersion, newVersion] = process.argv.slice(2);
   if (process.argv.length !== 4 || !oldVersion || !newVersion) {
-    throw new Error("usage: node scripts/set-pi-version.mjs <old-version> <new-version>");
+    throw new Error("usage: node scripts/helpers/set-pi-version.mjs <old-version> <new-version>");
   }
   const manifest = replaceField(
     "package.json",

@@ -2,7 +2,7 @@
  * Optionally sync Pi's derived changelog marker after an intentional pin edit.
  */
 import { readFileSync, writeFileSync } from "node:fs";
-import { readPackageEntries, validateExactPackageSource } from "./pi-package-common.mjs";
+import { readPackageEntries, validateExactPackageSource } from "../helpers/pi-package-common.mjs";
 
 /** Read a checked-in JSON file. */
 function readJson(path) {
