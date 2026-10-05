@@ -1,17 +1,17 @@
 # Pi credentials and local provider configuration
-/auth.json
-/auth.json.lock/
-/oauth.json
-/models.json
+auth.json
+auth.json.lock/
+oauth.json
+models.json
 
 # Pi runtime state and caches
 /sessions/
-/models-store.json
-/crashes.json
-/settings.json.lock/
-/trust.json
-/trust.json.lock/
-/pi-debug.log
+models-store.json
+crashes.json
+settings.json.lock/
+trust.json
+trust.json.lock/
+pi-debug.log
 /logs/
 *.log
 /tmp/
