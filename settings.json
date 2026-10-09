@@ -7,7 +7,7 @@
   "defaultModel": "gpt-5.5",
   "packages": [
     {
-      "source": "git:github.com/angristan/pi-extensions@124227c913dd4322bb333745f91d5129e7a85a41",
+      "source": "git:github.com/angristan/pi-extensions@79288d17fa760f7ec3a43638d5a5cf947c488685",
       "extensions": [
         "-extensions/goal/index.ts",
         "-extensions/herdr-process/index.ts",
