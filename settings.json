@@ -24,6 +24,8 @@
         "-extensions/context-management/index.ts",
         "+extensions/footer/index.ts"
       ]
-    }
+    },
+    "npm:pi-web-kit@0.3.0",
+    "npm:@narumitw/pi-firecrawl@0.51.0"
   ]
 }
