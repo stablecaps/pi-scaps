@@ -15,3 +15,13 @@ This repository is the version-controlled global harness for Pi.
 - Keep behavioral changes reproducible, reviewable, and documented.
 - Preserve pinned versions; update their documentation and verification together with any deliberate version change.
 - Before finalizing any task that changed files, inspect the diff and provide a ready-to-use multi-line commit message. If the change is trivial, a single line is fine.
+
+Web retrieval policy:
+- Prefer `web_search` for discovery and current information.
+- Prefer `web_fetch` when the relevant URL is already known.
+- Prefer `library_docs` for package, framework, SDK, and API documentation.
+- Prefer `code_search` for real-world implementation examples and usage patterns.
+- Prefer authoritative or primary sources when available.
+- Do not fetch pages when search results already provide sufficient evidence.
+- Use Firecrawl only for mapping, crawling, structured extraction, difficult pages, or when ordinary `web_fetch` cannot retrieve the required content.
+- Request only the number of results and amount of content needed for the task.
