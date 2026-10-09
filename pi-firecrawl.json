@@ -1,0 +1,11 @@
+{
+  "toolMode": "lazy",
+  "tools": [
+    "firecrawl_scrape",
+    "firecrawl_crawl",
+    "firecrawl_crawl_status",
+    "firecrawl_map",
+    "firecrawl_search"
+  ],
+  "updatedAt": 1
+}

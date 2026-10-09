@@ -10,7 +10,7 @@ repos:
       - id: check-added-large-files
       - id: check-case-conflict
       - id: check-json
-        files: ^(?:package(?:-lock)?\.json|settings\.json|models\.json\.example)$
+        files: ^(?:package(?:-lock)?\.json|settings\.json|models\.json\.example|pi-web-kit\.json|pi-firecrawl\.json)$
         types: [file]
       - id: check-merge-conflict
       - id: check-shebang-scripts-are-executable

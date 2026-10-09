@@ -1,0 +1,8 @@
+{
+  "provider_search": "exa",
+  "provider_fetch": "markdown_new",
+  "markdownNew": {
+    "method": "auto",
+    "retainImages": false
+  }
+}

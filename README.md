@@ -32,6 +32,7 @@ Install the prerequisites first, then ensure `~/.pi/agent` does not already exis
 git clone https://github.com/stablecaps/pi-scaps.git ~/.pi/agent
 cd ~/.pi/agent
 ./scripts/bootstrap.sh
+./scripts/apply-local-config.sh
 ./scripts/doctor.sh
 pi
 ```
@@ -57,6 +58,7 @@ line's example path with the actual checkout path:
 cd /path/to/pi-scaps
 export PI_CODING_AGENT_DIR="$PWD"
 ./scripts/bootstrap.sh
+./scripts/apply-local-config.sh
 ./scripts/doctor.sh
 pi
 ```
@@ -84,6 +86,8 @@ the startup file itself. Inside Pi, run `/login` if authentication is required.
 | `AGENTS.md` | Short global instructions loaded for every Pi session. |
 | `settings.json` | Portable Pi settings, including the external session directory and changelog marker. |
 | `keybindings.json` | Custom Pi terminal and application keybindings. |
+| `pi-web-kit.json` | Non-secret provider selection for the pinned `pi-web-kit` package. |
+| `pi-firecrawl.json` | Non-secret Firecrawl tool mode and capability selection. |
 | `models.json.example` | Safe schema example for an optional, ignored local `models.json`. |
 | `package.json` | Node requirement, authoritative Pi package/version contract, and future local extension dependencies. |
 | `package-lock.json` | npm-generated lockfile for deterministic local dependency installation. |
@@ -98,6 +102,7 @@ the startup file itself. Inside Pi, run `/login` if authentication is required.
 | `agents/README.md` | Defines what a future role file may control and prevents mistaken auto-discovery assumptions. |
 | `scripts/` | Operator commands that are safe to invoke from any working directory. |
 | `scripts/bootstrap.sh` | Converges the declared npm-managed Pi, installs locked local dependencies, reconciles pinned external packages, and prepares the external session directory. |
+| `scripts/apply-local-config.sh` | Links committed non-secret extension config into extension-specific runtime locations and checks local API-key environment status. |
 | `scripts/doctor.sh` | Checks runtime health: activation, command availability, pinned versions, dependencies, safe session storage, and offline Pi startup. |
 | `scripts/update.sh` | Fast-forwards a clean checkout, then uses bootstrap to converge Pi, locked dependencies, and pinned packages before doctor. |
 | `scripts/upgrade-pi.sh` | Proposes one explicit or npm-`latest` Pi version, or `--packages` for external package pins, and leaves verified metadata changes for review. |
@@ -135,6 +140,38 @@ The maintainer upgrade command updates the authoritative Pi version in
 together. If editing the pin manually, run
 `node scripts/checks/validate-contract.mjs --sync-pi-marker` to align the marker. The
 normal validator and pre-commit hook reject an unsynchronised marker.
+
+## Extension configuration
+
+The pinned `pi-web-kit` and `@narumitw/pi-firecrawl` packages are configured with committed, non-secret files:
+
+- `pi-web-kit.json` selects Exa for search and `markdown_new` for ordinary page fetching.
+- `pi-firecrawl.json` selects Firecrawl lazy mode with all five Firecrawl capabilities available.
+
+API keys stay outside the repository. A typical private key file is `~/.ssh/pi-api-keys.env`:
+
+```bash
+export EXA_API_KEY="..."
+export CONTEXT7_API_KEY="..."
+export FIRECRAWL_API_KEY="..."
+```
+
+Protect that file with local filesystem permissions and source it before launching Pi:
+
+```bash
+chmod 600 ~/.ssh/pi-api-keys.env
+source ~/.ssh/pi-api-keys.env
+```
+
+Run `./scripts/apply-local-config.sh` after bootstrap on each machine. It verifies that this checkout is Pi's active agent directory and links `~/.pi/agent/pi-web-kit.json` to the committed `pi-web-kit.json`. The link is needed because `pi-web-kit@0.3.0` reads that fixed global path even when Pi itself is activated through `PI_CODING_AGENT_DIR`. Firecrawl reads `pi-firecrawl.json` from the active agent directory, so no extra Firecrawl copy is created.
+
+To verify the local wiring and key environment without changing files, run:
+
+```bash
+./scripts/apply-local-config.sh --check --require-secrets
+```
+
+After changing extension config or API-key environment, start Pi again or run `/reload`; then verify Firecrawl with `/firecrawl status`.
 
 ## Secrets and local state
 
